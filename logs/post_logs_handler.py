@@ -1,6 +1,6 @@
 """POST logs handler
 """
-import datetime
+from datetime import datetime
 import json
 import tornado.web
 from elasticsearch import helpers
@@ -20,21 +20,18 @@ class PostLogsHandler(tornado.web.RequestHandler):
     def post(self):
         """Post /logs action.
         """
-        data = json.loads(self.request.body.decode('utf-8'))
+        logs = json.loads(self.request.body.decode('utf-8'))['logs']
 
-        date = datetime.datetime.now()
+        date = datetime.now()
         index = date.strftime('data-%Y-%m-%d-%H')
 
-        log_date = datetime.datetime.utcfromtimestamp(float(data['date']))
+        for log in logs:
+            log.update({'_type': 'logs'})
+            log['_index'] = index
+            log['date'] = datetime.utcfromtimestamp(float(log['date']))
 
         helpers.bulk(
             self.es_client,
-            [{
-                '_type': 'data',
-                '_index': index,
-                'date': log_date,
-                'message': data['message'],
-                'category': data['category'],
-                'level': data['level'],
-            }],
+            logs,
+            index=index,
         )
