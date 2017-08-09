@@ -27,6 +27,12 @@ curl http://localhost:8000/api/1/logs \
     -H 'Content-Type: application/json'
 ```
 
+## GET /logs
+
+```bash
+curl http://localhost:8000/api/1/logs/2017-10-15-20-00-00/2017-10-16-15-00-00 -X GET
+```
+
 ## Connect to Kibana
 
 In your browser:
