@@ -17,9 +17,7 @@ class PostLogsHandler(tornado.web.RequestHandler):
         """
         self.es_client = es_client
 
-    def post(
-        self,
-    ):
+    def post(self):
         """Post /logs action.
         """
         data = json.loads(self.request.body.decode('utf-8'))
@@ -32,7 +30,9 @@ class PostLogsHandler(tornado.web.RequestHandler):
             [{
                 '_type': 'data',
                 '_index': index,
-                'time': date,
+                'date': data['date'],
                 'message': data['message'],
+                'category': data['category'],
+                'level': data['level'],
             }],
         )
