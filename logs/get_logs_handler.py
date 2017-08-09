@@ -26,14 +26,33 @@ class GetLogsHandler(tornado.web.RequestHandler):
         """
         DATE_FORMAT = "%Y-%m-%d-%H-%M-%S"
 
+        start = datetime.strptime(
+            start_date,
+            DATE_FORMAT,
+        )
+
+        end = datetime.strptime(
+            end_date,
+            DATE_FORMAT,
+        )
+
+        # TODO: we simply build one index using the start date information;
+        # this will be modified according our decision regarding data sharding
+        search_index = "data-%d-%02d-%02d-%02d" % (
+            start.year,
+            start.month,
+            start.day,
+            start.hour,
+        )
+
         result = self.es_client.search(
-            index="data-2017-08-09-19",
+            index=search_index,
             body={
                 "query": {
                     "range": {
                         "date": {
-                            "gte": datetime.strptime(start_date, DATE_FORMAT),
-                            "lte": datetime.strptime(end_date, DATE_FORMAT),
+                            "gte": start,
+                            "lte": end,
                         }
                     }
                 }
