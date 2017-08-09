@@ -23,7 +23,7 @@ python -m "logs"
 ```bash
 curl http://localhost:8000/api/1/logs \
     -X POST \
-    -d '{"message": "log message", "level": "low", "category": "my category", "date": "1502304972"}'
+    -d '{"message": "log message", "level": "low", "category": "my category", "date": "1502304972"}' \
     -H 'Content-Type: application/json'
 ```
 
