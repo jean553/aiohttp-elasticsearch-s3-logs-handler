@@ -1,0 +1,38 @@
+---
+- hosts: localhost
+  become: yes
+
+  tasks:
+
+    - name: install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: copy nginx configuration
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: install pip packages tox
+      pip:
+        name="tox"
+        state=latest
+
+    - name: create tox environment
+      shell: >
+        tox -r -e {{ ansible_env.ENV_NAME }}
+      args:
+        chdir: "{{ ansible_env.APP_PATH }}"
+        creates: "{{ ansible_env.VIRTUAL_ENV_PATH }}"
+
+    - name: copy folder destination and virtualenv activation when ssh
+      lineinfile:
+        path: /home/vagrant/.zshrc
+        line: "cd /vagrant && source /tmp/virtual_env35/bin/activate"
