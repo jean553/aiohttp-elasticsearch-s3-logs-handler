@@ -23,20 +23,20 @@ class PostLogsHandler(tornado.web.RequestHandler):
     ):
         """Post /logs action.
         """
-        logs = json.loads(self.request.body.decode('utf-8'))['logs']
+        logs = json.loads(self.request.body.decode("utf-8"))["logs"]
 
         date = datetime.now()
-        index = date.strftime('data-{}-%Y-%m-%d'.format(service_id))
+        index = date.strftime("data-{}-%Y-%m-%d".format(service_id))
 
         for log in logs:
             log.update(
                 {
-                    '_type': 'logs',
-                    'service_id': service_id,
+                    "_type": "logs",
+                    "service_id": service_id,
                 }
             )
-            log['_index'] = index
-            log['date'] = datetime.utcfromtimestamp(float(log['date']))
+            log["_index"] = index
+            log["date"] = datetime.utcfromtimestamp(float(log["date"]))
 
         helpers.bulk(
             self.es_client,

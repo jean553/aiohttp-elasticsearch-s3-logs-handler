@@ -68,6 +68,6 @@ class GetLogsHandler(tornado.web.RequestHandler):
             response += str(log["_source"])
             if counter != last_log_index:
                 response += ","
-        response += ']}'
+        response += "]}"
 
         self.write(response)
