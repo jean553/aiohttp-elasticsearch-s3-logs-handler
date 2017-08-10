@@ -21,7 +21,7 @@ python -m "logs"
 ## POST /logs
 
 ```bash
-curl http://localhost:8000/api/1/logs \
+curl http://localhost:8000/api/1/service/1/logs \
     -X POST \
     -d '{"logs": [{"message": "log message", "level": "low", "category": "my category", "date": "1502304972"}]}' \
     -H 'Content-Type: application/json'
@@ -30,7 +30,7 @@ curl http://localhost:8000/api/1/logs \
 ## GET /logs
 
 ```bash
-curl http://localhost:8000/api/1/logs/2017-10-15-20-00-00/2017-10-16-15-00-00 -X GET
+curl http://localhost:8000/api/1/service/1/logs/2017-10-15-20-00-00/2017-10-16-15-00-00 -X GET
 ```
 
 ## Connect to Kibana

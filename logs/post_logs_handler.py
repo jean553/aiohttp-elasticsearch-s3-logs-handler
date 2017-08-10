@@ -26,7 +26,7 @@ class PostLogsHandler(tornado.web.RequestHandler):
         logs = json.loads(self.request.body.decode('utf-8'))['logs']
 
         date = datetime.now()
-        index = date.strftime('data-%Y-%m-%d')
+        index = date.strftime('data-{}-%Y-%m-%d'.format(service_id))
 
         for log in logs:
             log.update(

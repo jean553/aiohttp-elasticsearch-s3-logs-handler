@@ -39,11 +39,11 @@ class GetLogsHandler(tornado.web.RequestHandler):
 
         # TODO: we simply build one index using the start date information;
         # this will be modified according our decision regarding data sharding
-        search_index = "data-%d-%02d-%02d-%02d" % (
+        search_index = "data-%s-%d-%02d-%02d" % (
+            service_id,
             start.year,
             start.month,
             start.day,
-            start.hour,
         )
 
         result = self.es_client.search(
