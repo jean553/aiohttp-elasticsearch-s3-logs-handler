@@ -36,3 +36,8 @@
       lineinfile:
         path: /home/vagrant/.zshrc
         line: "cd /vagrant && source /tmp/virtual_env35/bin/activate"
+
+    - name: call elasticsearch API for data indices template creation
+      script: ./create_template.sh
+      args:
+        chdir: "/vagrant/build_scripts"
