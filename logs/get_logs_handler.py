@@ -19,6 +19,7 @@ class GetLogsHandler(tornado.web.RequestHandler):
 
     def get(
         self,
+        service_id,
         start_date,
         end_date,
     ):

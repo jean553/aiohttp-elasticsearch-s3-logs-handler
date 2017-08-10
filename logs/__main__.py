@@ -17,8 +17,8 @@ def main():
 
     app = tornado.web.Application(
         [
-            (r"/api/1/logs", PostLogsHandler, context),
-            (r"/api/1/logs/(.*)/(.*)", GetLogsHandler, context)
+            (r"/api/1/service/(.*)/logs", PostLogsHandler, context),
+            (r"/api/1/service/(.*)/logs/(.*)/(.*)", GetLogsHandler, context)
         ]
     )
     app.listen(8000)
