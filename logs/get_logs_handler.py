@@ -50,10 +50,19 @@ class GetLogsHandler(tornado.web.RequestHandler):
             index=search_index,
             body={
                 "query": {
-                    "range": {
-                        "date": {
-                            "gte": start,
-                            "lte": end,
+                    "bool": {
+                        "must": {
+                            "match": {
+                                "service_id": service_id
+                            }
+                        },
+                        "filter": {
+                            "range": {
+                                "date": {
+                                    "gte": start,
+                                    "lte": end
+                                }
+                            }
                         }
                     }
                 }
