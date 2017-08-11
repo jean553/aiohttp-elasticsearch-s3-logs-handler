@@ -41,6 +41,13 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     end
   end
 
+  config.vm.define "s3" do |s3|
+    s3.vm.provider "docker" do |d|
+      d.image = "jean553/docker-s3-server-dev"
+      d.name = "#{PROJECT}_s3"
+    end
+  end
+
   config.ssh.insert_key = true
   config.vm.define "dev", primary: true do |app|
     app.vm.provider "docker" do |d|
