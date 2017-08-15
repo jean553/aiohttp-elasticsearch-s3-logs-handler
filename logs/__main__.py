@@ -3,13 +3,16 @@
 import tornado
 from elasticsearch import Elasticsearch
 
+from logs.config import ELASTICSEARCH_HOSTNAME
+
 from logs.post_logs_handler import PostLogsHandler
 from logs.get_logs_handler import GetLogsHandler
 
 def main():
-    """starts the tornado server
     """
-    es_client = Elasticsearch(hosts=['elasticsearch'],)
+    Starts the tornado server
+    """
+    es_client = Elasticsearch(hosts=[ELASTICSEARCH_HOSTNAME],)
 
     context = {
         'es_client': es_client,
