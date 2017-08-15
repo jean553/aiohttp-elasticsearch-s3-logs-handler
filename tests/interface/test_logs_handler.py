@@ -1,7 +1,7 @@
 """
 Tests for POST logs
 """
-
+import time
 from datetime import datetime
 
 import pytest
@@ -25,6 +25,7 @@ def test_post_log():
             }
         }
     )
+    time.sleep(3)
 
     json = {
         "logs": [
@@ -42,6 +43,7 @@ def test_post_log():
         json=json,
     )
     assert response.status_code == 200
+    time.sleep(3)
 
     result = es_client.search(
         index="data-1-2017-08-15",
