@@ -15,6 +15,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     "APP_PATH" => "/vagrant",
     "VIRTUAL_ENV_PATH" => "/tmp/virtual_env35",
     "PROJECT" => PROJECT,
+    "ELASTICSEARCH_HOSTNAME" => "elasticsearch",
   }
 
   config.vm.define "elasticsearch" do |app|
