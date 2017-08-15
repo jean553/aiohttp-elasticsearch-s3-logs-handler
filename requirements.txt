@@ -1,2 +1,6 @@
 elasticsearch
 tornado
+
+# for tests
+pytest
+requests
