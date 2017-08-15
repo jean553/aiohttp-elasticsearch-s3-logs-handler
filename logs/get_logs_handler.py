@@ -1,4 +1,5 @@
-"""GET logs handler
+"""
+GET logs handler
 """
 from datetime import datetime
 import json
@@ -6,14 +7,16 @@ import tornado.web
 from elasticsearch import helpers
 
 class GetLogsHandler(tornado.web.RequestHandler):
-    """Get logs handler.
+    """
+    Get logs handler.
     """
 
     def initialize(
         self,
         es_client,
     ):
-        """Initializes the received request handling process.
+        """
+        Initializes the received request handling process.
         """
         self.es_client = es_client
 
@@ -23,7 +26,8 @@ class GetLogsHandler(tornado.web.RequestHandler):
         start_date,
         end_date,
     ):
-        """Get /logs action.
+        """
+        Get /logs action.
         """
         DATE_FORMAT = "%Y-%m-%d-%H-%M-%S"
 

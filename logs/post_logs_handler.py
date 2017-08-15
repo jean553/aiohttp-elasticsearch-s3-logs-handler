@@ -1,4 +1,5 @@
-"""POST logs handler
+"""
+POST logs handler
 """
 from datetime import datetime
 import json
@@ -6,14 +7,16 @@ import tornado.web
 from elasticsearch import helpers
 
 class PostLogsHandler(tornado.web.RequestHandler):
-    """Post logs handler.
+    """
+    Post logs handler.
     """
 
     def initialize(
         self,
         es_client,
     ):
-        """Initializes the received request handling process.
+        """
+        Initializes the received request handling process.
         """
         self.es_client = es_client
 
@@ -21,7 +24,8 @@ class PostLogsHandler(tornado.web.RequestHandler):
         self,
         service_id,
     ):
-        """Post /logs action.
+        """
+        Post /logs action.
         """
         logs = json.loads(self.request.body.decode("utf-8"))["logs"]
 
