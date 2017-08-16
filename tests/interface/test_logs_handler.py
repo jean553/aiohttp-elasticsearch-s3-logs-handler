@@ -46,8 +46,15 @@ def test_post_log():
     assert response.status_code == 200
     time.sleep(3)
 
+    now = datetime.now()
+    index = "data-1-%04d-%02d-%02d" % (
+        now.year,
+        now.month,
+        now.day,
+    )
+
     result = es_client.search(
-        index="data-1-2017-08-15",
+        index=index,
         body={
             "query": {
                 "bool": {
@@ -84,24 +91,32 @@ def test_get_logs():
     )
     time.sleep(3)
 
+    LOG_MESSAGE = "a message to get"
+    LOG_LEVEL = "low"
+    LOG_CATEGORY = "a category"
+
     es_client.create(
         index="data-1-2017-08-01",
         doc_type="logs",
         id="1",
         body={
             "service_id": "1",
-            "message": "a message to get",
-            "level": "low",
-            "category": "a category",
-            "date": "1501588800",
+            "message": LOG_MESSAGE,
+            "level": LOG_LEVEL,
+            "category": LOG_CATEGORY,
+            "date": datetime.utcfromtimestamp(float("1502885498")),
         }
     )
     time.sleep(3)
 
-    #response = requests.get(
-    #    BASE_URL + "/logs/2017-08-01-10-00-00/2017-08-01-14-00-00",
-    #)
-    #assert response.status_code == 200
+    response = requests.get(
+        BASE_URL + "/logs/2017-08-16-10-00-00/2017-08-16-16-00-00",
+    )
+    assert response.status_code == 200
+    assert len(response.json()["logs"]) == 1
 
-    #print(response.json())
-    #assert False
+    log = response.json()["logs"][0]
+
+    assert log["message"] == LOG_MESSAGE
+    assert log["level"] == LOG_LEVEL
+    assert log["category"] == LOG_CATEGORY
