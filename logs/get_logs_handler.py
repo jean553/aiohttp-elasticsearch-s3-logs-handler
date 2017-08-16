@@ -65,13 +65,8 @@ class GetLogsHandler(tornado.web.RequestHandler):
         )
 
         logs = result["hits"]["hits"]
-        last_log_index = len(logs) - 1
+        logs_without_metadata = list()
+        for log in logs:
+            logs_without_metadata.append(log["_source"])
 
-        response = '{"logs": ['
-        for counter, log in enumerate(logs):
-            response += str(log["_source"])
-            if counter != last_log_index:
-                response += ","
-        response += "]}"
-
-        self.write(response)
+        self.write({"logs": logs_without_metadata})
