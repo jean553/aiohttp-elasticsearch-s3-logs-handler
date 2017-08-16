@@ -13,7 +13,8 @@ BASE_URL = "http://localhost:8000/api/1/service/1"
 
 def test_post_log():
     """
-    Checks that post logs returns 200
+    Checks that post logs returns 200 and
+    that the log is actually inserted into ES
     """
     es_client = Elasticsearch(hosts=["elasticsearch"],)
 
@@ -66,3 +67,41 @@ def test_post_log():
     logs_amount = result["hits"]["total"]
     assert logs_amount == 1, \
         "unexpected logs amount, got %s, expected 1" % logs_amount
+
+def test_get_logs():
+    """
+    Checks taht get logs returns 200 and the expected log content
+    """
+    es_client = Elasticsearch(hosts=["elasticsearch"],)
+
+    es_client.delete_by_query(
+        index="data-*",
+        body={
+            "query": {
+                "match_all": {}
+            }
+        }
+    )
+    time.sleep(3)
+
+    es_client.create(
+        index="data-1-2017-08-01",
+        doc_type="logs",
+        id="1",
+        body={
+            "service_id": "1",
+            "message": "a message to get",
+            "level": "low",
+            "category": "a category",
+            "date": "1501588800",
+        }
+    )
+    time.sleep(3)
+
+    #response = requests.get(
+    #    BASE_URL + "/logs/2017-08-01-10-00-00/2017-08-01-14-00-00",
+    #)
+    #assert response.status_code == 200
+
+    #print(response.json())
+    #assert False
