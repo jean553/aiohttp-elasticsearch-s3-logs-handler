@@ -18,6 +18,12 @@ vagrant ssh
 python -m "logs"
 ```
 
+## Tests
+
+```bash
+py.test
+```
+
 ## POST /logs
 
 ```bash
