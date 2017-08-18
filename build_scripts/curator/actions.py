@@ -2,8 +2,12 @@
 actions:
   1:
     action: snapshot
-    repository: "my_repository"
     description: >
       Attempt to create AWS S3 snapshot
     options:
-      name: 'curator-%Y-%m-%d'
+      repository: "s3-backup"
+      name: "s3_backup_%Y_%m_%d"
+    filters:
+      - filtertype: pattern
+        kind: prefix
+        value: data-
