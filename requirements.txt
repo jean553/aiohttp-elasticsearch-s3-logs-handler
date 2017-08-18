@@ -1,5 +1,7 @@
 elasticsearch
 tornado
+boto3
+elasticsearch-curator
 
 # for tests
 pytest

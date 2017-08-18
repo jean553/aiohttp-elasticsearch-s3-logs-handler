@@ -41,3 +41,8 @@
       script: ./create_template.sh
       args:
         chdir: "/vagrant/build_scripts"
+
+    - name: call elasticsearch API for S3 snapshots repository creation
+      script: ./create_repository.sh
+      args:
+        chdir: "/vagrant/build_scripts"

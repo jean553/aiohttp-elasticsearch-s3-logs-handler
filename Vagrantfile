@@ -26,6 +26,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
         "http.host" => "0.0.0.0",
         "transport.host" => "127.0.0.1",
         "xpack.security.enabled" => "false",
+        "path.repo" => "/tmp",
       }
     end
   end

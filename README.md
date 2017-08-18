@@ -43,3 +43,10 @@ http://kibana-container-ip-address:5601
 
 This IP address can be found using `docker inspect tornado-kibana-logs-handler_kibana`.
 The index pattern is `data-*`.
+
+## Create indices snapshots
+
+```bash
+cd build_scripts/curator
+curator --config config.py actions.py
+```
