@@ -38,11 +38,7 @@
         line: "cd /vagrant && source /tmp/virtual_env35/bin/activate"
 
     - name: call elasticsearch API for data indices template creation
-      script: ./create_template.sh
-      args:
-        chdir: "/vagrant/build_scripts"
+      script: ./scripts/create_template.sh
 
     - name: call elasticsearch API for S3 snapshots repository creation
-      script: ./create_repository.sh
-      args:
-        chdir: "/vagrant/build_scripts"
+      script: ./scripts/create_repository.sh
