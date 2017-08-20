@@ -1,5 +1,7 @@
 # tornado-kibana-logs-handler
 
+/!\ Start this project will create a new bucket into your AWS account.
+
 ## Project overview and status
 
 ### Overview
