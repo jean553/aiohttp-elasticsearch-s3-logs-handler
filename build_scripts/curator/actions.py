@@ -5,8 +5,8 @@ actions:
     description: >
       Attempt to create AWS S3 snapshot
     options:
-      repository: "s3-backup"
-      name: "s3_backup_%Y_%m_%d"
+      repository: "backups"
+      name: "backups_%Y_%m_%d"
     filters:
       - filtertype: pattern
         kind: prefix
