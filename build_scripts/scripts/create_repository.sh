@@ -1,9 +1,13 @@
 #!/bin/bash
-curl -XPUT 'http://elasticsearch:9200/_snapshot/s3-backup' -d '
+curl -XPUT 'http://elasticsearch:9200/_snapshot/backups' -d '
 {
-  "type": "fs",
+  "type": "s3",
   "settings": {
-    "location": "/tmp"
+    "bucket": "backups",
+    "protocol": "http",
+    "endpoint": "s3:5000",
+    "access_key": "dummy",
+    "secret_key": "dummy"
   }
 }
 '
