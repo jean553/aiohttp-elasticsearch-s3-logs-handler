@@ -110,6 +110,8 @@ docker exec -it tornado-kibana-logs-handler_elasticsearch /bin/bash
 bin/elasticsearch-plugin install repository-s3
 ```
 
+The ES container must be restarted.
+
 ## Create S3 bucket
 
 ```bash
