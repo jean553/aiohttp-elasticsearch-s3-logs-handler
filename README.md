@@ -114,29 +114,8 @@ bin/elasticsearch-plugin install repository-s3
 
 The ES container must be restarted.
 
-## Create S3 bucket
-
-```bash
-python build_scripts/scripts/create_bucket.py
-```
-
-## Create an ElasticSearch repository for S3 upload
-
-```
-curl -XPUT 'http://elasticsearch:9200/_snapshot/backups_repository' -d '
-{
-    "type": "s3",
-    "settings": {
-        "bucket": "YOUR_BUCKET_NAME",
-        "access_key": "YOUR_ACCESS_KEY",
-        "secret_key": "YOUR_SECRET_KEY"
-    }
-}
-'
-```
-
 ## Snapshot to S3
 
-```
-curl -XPUT 'http://elasticsearch:9200/_snapshot/backups_repository/snapshot_name?wait_for_completion=true'
+```bash
+./build_scripts/scripts/make_snapshot.sh
 ```
