@@ -2,9 +2,11 @@
 # vi: set ft=ruby ts=2 sw=2 expandtab :
 
 PROJECT = "tornado-kibana-logs-handler"
-ENV['VAGRANT_NO_PARALLEL'] = 'yes'
-ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+ENV["VAGRANT_NO_PARALLEL"] = "yes"
+ENV["VAGRANT_DEFAULT_PROVIDER"] = "docker"
 VAGRANTFILE_VERSION = "2"
+S3_BUCKET_NAME = "tornado-kibana-logs-handler"
+S3_ENDPOINT = "s3:5000"
 
 Vagrant.configure(VAGRANTFILE_VERSION) do |config|
 
@@ -20,7 +22,8 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     # add your credentials here
     "AWS_ACCESS_KEY" => "dummy",
     "AWS_SECRET_KEY" => "dummy",
-    "S3_BUCKET_NAME" => "tornado-kibana-logs-handler"
+    "S3_BUCKET_NAME" => S3_BUCKET_NAME,
+    "S3_ENDPOINT" => S3_ENDPOINT
   }
 
   # TODO: #27 the fake S3 bucket seems to save the files correctly
@@ -38,7 +41,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
       d.name = "#{PROJECT}_elasticsearch"
       # ES looks for S3 container hostname with the bucket name
       # and custom endpoint (backups.s3)
-      d.link "#{PROJECT}_s3:backups.s3"
+      d.link "#{PROJECT}_s3:#{S3_BUCKET_NAME}.s3"
       d.env = {
         "http.host" => "0.0.0.0",
         "transport.host" => "127.0.0.1",
