@@ -1,7 +1,5 @@
 # tornado-kibana-logs-handler
 
-/!\ Start this project will create a new bucket into your AWS account.
-
 ## Project overview and status
 
 ### Overview
@@ -17,11 +15,11 @@ Four containers are included into the project:
 
 ### Status
 
-The project currently works with a real AWS S3 bucket.
-This is not possible yet to upload logs from ES to the fake local S3 (https://github.com/jean553/docker-s3-server-dev)
-but it would be better for development purposes.
+The project works with both local and remote S3.
 
-Error when trying to create a repository with the local S3:
+#### Error when creating a repository with a local S3
+
+The repository creation and the snapshots work, but the following error is returned:
 
 ```bash
 curl -XPUT 'http://elasticsearch:9200/_snapshot/repository' -d '
@@ -96,13 +94,6 @@ http://kibana-container-ip-address:5601
 This IP address can be found using `docker inspect tornado-kibana-logs-handler_kibana`.
 The index pattern is `data-*`.
 
-## Create indices snapshots
-
-```bash
-cd build_scripts/curator
-curator --config config.py actions.py
-```
-
 ## Install S3 Plugin on Elasticsearch
 
 TODO: #26 get rid of S3 plugin manual installation, this should be done automatically
@@ -113,6 +104,12 @@ bin/elasticsearch-plugin install repository-s3
 ```
 
 The ES container must be restarted.
+
+## Create repository
+
+```bash
+./build_scripts/scripts/create_repository.sh
+```
 
 ## Snapshot to S3
 

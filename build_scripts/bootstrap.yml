@@ -42,6 +42,3 @@
 
     - name: create a bucket on S3
       shell: "{{ ansible_env.VIRTUAL_ENV_PATH }}/bin/python {{ ansible_env.APP_PATH }}/build_scripts/scripts/create_bucket.py"
-
-    - name: call elasticsearch API for S3 snapshots repository creation
-      script: ./scripts/create_repository.sh
