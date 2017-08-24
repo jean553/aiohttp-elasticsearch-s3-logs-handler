@@ -51,7 +51,10 @@
     - name: create a bucket on S3
       shell: "{{ ansible_env.VIRTUAL_ENV_PATH }}/bin/python {{ ansible_env.APP_PATH }}/build_scripts/scripts/create_bucket.py"
 
-    - name: enable automatic backup script execution
+    - name: execute automatic indices backup to s3
       cron:
+        name: "automatic indices snapshot to s3"
         minute: "0"
-        job: python ./scripts/make_snapshot.py
+        job: "python ./scripts/make_snapshot.py"
+        cron_file: /etc/cron.d/snapshot
+        user: root
