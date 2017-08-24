@@ -4,11 +4,14 @@
 
   tasks:
 
-    - name: install nginx
+    - name: install nginx and npm (required to install elasticdump)
       apt:
-        name: nginx
+        name: "{{ item }}"
         state: present
         update_cache: yes
+      with_items:
+         - nginx
+         - npm
 
     - name: copy nginx configuration
       copy:
@@ -31,6 +34,11 @@
       args:
         chdir: "{{ ansible_env.APP_PATH }}"
         creates: "{{ ansible_env.VIRTUAL_ENV_PATH }}"
+
+    - name: install elasticdump using npm
+      npm:
+        name: elasticdump
+        global: yes
 
     - name: copy folder destination and virtualenv activation when ssh
       lineinfile:
