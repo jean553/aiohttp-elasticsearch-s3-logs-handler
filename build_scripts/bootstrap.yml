@@ -32,6 +32,11 @@
         chdir: "{{ ansible_env.APP_PATH }}"
         creates: "{{ ansible_env.VIRTUAL_ENV_PATH }}"
 
+    - name: install elasticdump using npm
+      npm:
+        name: elasticdump
+        global: yes
+
     - name: copy folder destination and virtualenv activation when ssh
       lineinfile:
         path: /home/vagrant/.zshrc
