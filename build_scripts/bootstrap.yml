@@ -4,11 +4,14 @@
 
   tasks:
 
-    - name: install nginx
+    - name: install nginx and npm (required to install elasticdump)
       apt:
-        name: nginx
+        name: "{{ item }}"
         state: present
         update_cache: yes
+      with_items:
+         - nginx
+         - npm
 
     - name: copy nginx configuration
       copy:
