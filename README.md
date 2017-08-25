@@ -116,3 +116,12 @@ The ES container must be restarted.
 ```bash
 ./build_scripts/scripts/make_snapshot.sh
 ```
+
+## Snapshot to JSON file using Elasticdump
+
+```bash
+elasticdump \
+    --input=http://elasticsearch:9200/data-1-20-17-08-01 \
+    --output=result.json \
+    --type=data
+```
