@@ -1,28 +1,31 @@
 """
-POST logs handler
+POST logs handler.
 """
 from datetime import datetime
 import json
-import tornado.web
 from elasticsearch import helpers
 
-class PostLogsHandler(tornado.web.RequestHandler):
+from logs.abstract_handler import AbstractLogsHandler
+
+
+# a class is supposed to contain at least more than one public method;
+# we separated the post method from the get in order to keep small files
+# pylint: disable=too-few-public-methods
+#
+# the arguments differ from the initial Tornado method signature
+# (def post(self))
+# pylint: disable=arguments-differ
+class PostLogsHandler(AbstractLogsHandler):
     """
     Post logs handler.
     """
 
-    def initialize(
-        self,
-        es_client,
-    ):
-        """
-        Initializes the received request handling process.
-        """
-        self.es_client = es_client
-
+    # the arguments differ from the initial Tornado method signature
+    # (def post(self))
+    # pylint: disable=arguments-differ
     def post(
-        self,
-        service_id,
+            self,
+            service_id,
     ):
         """
         Post /logs action.

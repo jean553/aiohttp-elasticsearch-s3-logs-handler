@@ -1,36 +1,34 @@
 """
-GET logs handler
+GET logs handler.
 """
 from datetime import datetime
-import json
-import tornado.web
-from elasticsearch import helpers
 
-class GetLogsHandler(tornado.web.RequestHandler):
+from logs.abstract_handler import AbstractLogsHandler
+
+DATE_FORMAT = "%Y-%m-%d-%H-%M-%S"
+
+
+# a class is supposed to contain at least more than one public method;
+# we separated the post method from the get in order to keep small files
+# pylint: disable=too-few-public-methods
+#
+# the arguments differ from the initial Tornado method signature
+# (def get(self))
+# pylint: disable=arguments-differ
+class GetLogsHandler(AbstractLogsHandler):
     """
     Get logs handler.
     """
 
-    def initialize(
-        self,
-        es_client,
-    ):
-        """
-        Initializes the received request handling process.
-        """
-        self.es_client = es_client
-
     def get(
-        self,
-        service_id,
-        start_date,
-        end_date,
+            self,
+            service_id,
+            start_date,
+            end_date,
     ):
         """
         Get /logs action.
         """
-        DATE_FORMAT = "%Y-%m-%d-%H-%M-%S"
-
         start = datetime.strptime(
             start_date,
             DATE_FORMAT,
