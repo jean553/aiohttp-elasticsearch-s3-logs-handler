@@ -3,6 +3,7 @@
 Creates a snapshot of for one index.
 '''
 
+
 def main():
     '''
     Script entry point.
@@ -10,6 +11,7 @@ def main():
     TODO
     '''
     pass
+
 
 if __name__ == '__main__':
     main()

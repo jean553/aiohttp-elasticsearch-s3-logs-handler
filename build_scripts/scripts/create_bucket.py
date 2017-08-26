@@ -6,6 +6,7 @@ Creates a dummy bucket inside the S3 fake service.
 import os
 import boto3
 
+
 def generate_bucket():
     '''
     Generate the bucket according
@@ -19,11 +20,13 @@ def generate_bucket():
     )
     resource.create_bucket(Bucket=os.getenv('S3_BUCKET_NAME'))
 
+
 def main():
     '''
     Script entry point
     '''
     generate_bucket()
+
 
 if __name__ == '__main__':
     main()
