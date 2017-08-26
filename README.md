@@ -68,6 +68,12 @@ python -m "logs"
 py.test
 ```
 
+## Pylint
+
+```bash
+pylint logs/
+```
+
 ## POST /logs
 
 ```bash
