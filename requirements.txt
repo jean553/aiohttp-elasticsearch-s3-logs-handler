@@ -3,6 +3,9 @@ tornado
 boto3
 elasticsearch-curator
 
+# for dev
+pylint
+
 # for tests
 pytest
 requests
