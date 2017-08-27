@@ -69,3 +69,4 @@
       file:
         path: /tmp/snapshots
         state: directory
+        mode: 777 # full directory access
