@@ -2,9 +2,11 @@
 '''
 Creates a snapshot of for one index.
 '''
+import os
 import requests
 
 ELASTICSEARCH_ENDPOINT = 'http://elasticsearch:9200'
+SNAPSHOTS_DIRECTORY = '/tmp/snapshots'
 
 
 def get_data_indices():
@@ -23,6 +25,28 @@ def get_data_indices():
     ]
 
 
+def generate_snapshot(index_name):
+    '''
+    Generate the dump for the given index
+    and stores it into the snapshots directory.
+
+    Args:
+        index_name(str) name of the index
+    '''
+    os.system(
+        '''
+        elasticdump \
+            --input=%(elasticsearch_endpoint)s/%(index_name)s \
+            --output=%(snapshots_directory)s/%(index_name)s \
+            --type=data
+        ''' % ({
+            'index_name': index_name,
+            'snapshots_directory': SNAPSHOTS_DIRECTORY,
+            'elasticsearch_endpoint': ELASTICSEARCH_ENDPOINT,
+        })
+    )
+
+
 def main():
     '''
     Script entry point.
@@ -30,10 +54,8 @@ def main():
 
     indices = get_data_indices()
 
-    # FIXME: only for debug purposes,
-    # must be deleted
     for index in indices:
-        print(index)
+        generate_snapshot(index)
 
 
 if __name__ == '__main__':

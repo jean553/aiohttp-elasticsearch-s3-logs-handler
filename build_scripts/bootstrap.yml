@@ -69,3 +69,6 @@
       file:
         path: /tmp/snapshots
         state: directory
+        # full directory access
+        owner: vagrant
+        group: vagrant
