@@ -64,3 +64,8 @@
         src: /usr/bin/nodejs
         dest: /usr/bin/node
         state: link
+
+    - name: create the snapshots directory
+      file:
+        path: /tmp/snapshots
+        state: directory
