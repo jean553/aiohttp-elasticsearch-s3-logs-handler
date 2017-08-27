@@ -5,6 +5,13 @@ Creates a snapshot of for one index.
 import os
 import requests
 
+import boto3
+
+AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
+AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
+S3_ENDPOINT = os.getenv('S3_ENDPOINT')
+S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+
 ELASTICSEARCH_ENDPOINT = 'http://elasticsearch:9200'
 SNAPSHOTS_DIRECTORY = '/tmp/snapshots'
 
