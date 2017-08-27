@@ -69,4 +69,6 @@
       file:
         path: /tmp/snapshots
         state: directory
-        mode: 777 # full directory access
+        # full directory access
+        owner: vagrant
+        group: vagrant
