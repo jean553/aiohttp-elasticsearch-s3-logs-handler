@@ -25,9 +25,10 @@ def get_data_indices():
     ]
 
 
-def get_index_data(index_name):
+def generate_snapshot(index_name):
     '''
-    Generate the dump for the given index.
+    Generate the dump for the given index
+    and stores it into the snapshots directory.
 
     Args:
         index_name(str) name of the index
@@ -54,7 +55,7 @@ def main():
     indices = get_data_indices()
 
     for index in indices:
-        get_index_data(index)
+        generate_snapshot(index)
 
 
 if __name__ == '__main__':
