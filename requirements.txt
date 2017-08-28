@@ -9,3 +9,7 @@ pylint
 # for tests
 pytest
 requests
+
+# for performance tests
+aiohttp
+asyncio
