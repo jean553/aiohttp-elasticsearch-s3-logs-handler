@@ -131,3 +131,11 @@ elasticdump \
     --output=result.json \
     --type=data
 ```
+
+## Performance tests
+
+This test performs a lot of POST requests for many logs from many services TSV files.
+
+```bash
+python tests/performance/performance_test.py
+```
