@@ -18,6 +18,9 @@ import aiohttp
 POST_LOGS_ENDPOINT = 'http://localhost:8000/api/1/service/1/logs'
 TSV_FILES_DIRECTORY = '/vagrant/tests/performance/files/'
 
+START_TIMESTAMP = 1504008000
+END_TIMESTAMP = 1504011600
+
 
 async def send_data(json):
     '''
