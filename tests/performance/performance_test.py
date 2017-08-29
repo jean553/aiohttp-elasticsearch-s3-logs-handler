@@ -9,6 +9,7 @@ In order to generate a lot of requests,
 POST requests are performed asynchronously.
 '''
 
+import os
 import csv
 
 import asyncio
@@ -38,38 +39,38 @@ def main():
     Script entry point.
     '''
 
-    # FIXME: #44 takes a specific file for development purposes;
-    # should browse a folder and take all TSV files inside.
-    file_path = TSV_FILES_DIRECTORY + '1.tsv'
-
-    with open(file_path) as logs_file:
-
-        # FIXME: #45 we read the whole file for now,
-        # but we should only read one minute of logs
-        csv_reader = csv.reader(
-            logs_file,
-            delimiter='\t',
-        )
-
-        logs = list()
-
-        for line in csv_reader:
-
-            # TODO: #46 investigate why should I do this
-            # as we iterate over the CSV reader
-            log = line[0].split()
-
-            logs.append({
-                'date': log[1],
-                'level': log[2],
-                'category': log[3],
-                'message': log[4],
-            })
-
-        json = {'logs': logs}
-
+    logs_files = os.listdir(TSV_FILES_DIRECTORY)
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(send_data(json))
+
+    for file_path in logs_files:
+
+        with open(TSV_FILES_DIRECTORY + file_path) as logs_file:
+
+            # FIXME: #45 we read the whole file for now,
+            # but we should only read one minute of logs
+            csv_reader = csv.reader(
+                logs_file,
+                delimiter='\t',
+            )
+
+            logs = list()
+
+            for line in csv_reader:
+
+                # TODO: #46 investigate why should I do this
+                # as we iterate over the CSV reader
+                log = line[0].split()
+
+                logs.append({
+                    'date': log[1],
+                    'level': log[2],
+                    'category': log[3],
+                    'message': log[4],
+                })
+
+            json = {'logs': logs}
+
+        loop.run_until_complete(send_data(json))
 
 
 if __name__ == '__main__':
