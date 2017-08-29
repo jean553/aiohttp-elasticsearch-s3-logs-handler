@@ -15,7 +15,6 @@ import csv
 import asyncio
 import aiohttp
 
-POST_LOGS_ENDPOINT = 'http://localhost:8000/api/1/service/1/logs'
 TSV_FILES_DIRECTORY = '/vagrant/tests/performance/files/'
 
 # 2017-08-29 12:00 to 13:00
@@ -25,16 +24,20 @@ END_TIMESTAMP = 1504011600
 SECONDS_INTERVAL = 60
 
 
-async def send_data(json):
+async def send_data(
+    json,
+    service_id,
+):
     '''
     Posts data to the service.
 
     Args:
         json(dict): json data to send
+        service_id(str): the service id (POST URL parameter)
     '''
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            POST_LOGS_ENDPOINT,
+            'http://localhost:8000/api/1/service/{}/logs'.format(service_id),
             json=json,
         ) as response:
             await response.text()
@@ -88,7 +91,12 @@ def main():
                 json = {'logs': logs}
 
                 if logs:
-                    loop.run_until_complete(send_data(json))
+                    loop.run_until_complete(
+                        send_data(
+                            json,
+                            service_id=log[0],
+                        )
+                    )
 
         start_timestamp += SECONDS_INTERVAL
         end_timestamp += SECONDS_INTERVAL
