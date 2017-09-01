@@ -25,6 +25,7 @@ def test_post_log():
     remove_all_data_indices(es_client)
     time.sleep(WAIT_TIME)
 
+    # August 9, 2017 06:56:12 pm
     log_timestamp = 1502304972
 
     json = {

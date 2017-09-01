@@ -7,6 +7,7 @@ Functionnal test that checks that:
 '''
 import os
 import time
+from datetime import datetime
 
 import requests
 
@@ -28,14 +29,21 @@ def test_post_and_upload():
     remove_all_data_indices(es_client)
     time.sleep(WAIT_TIME)
 
+    log_message = 'a first log message'
+    log_level = 'a low level'
+    log_category = 'a first category'
+
+    # August 9, 2017 06:56:12 pm
     log_timestamp = 1502304972
+    log_datetime = datetime.utcfromtimestamp(log_timestamp)
+    log_date = log_datetime.strftime('%Y-%m-%dT%H:%M:%S')
 
     json = {
         'logs': [
             {
-                'message': 'a first log message',
-                'level': 'a low level',
-                'category': 'a first category',
+                'message': log_message,
+                'level': log_level,
+                'category': log_category,
                 'date': str(log_timestamp),
             }
         ]
@@ -46,3 +54,16 @@ def test_post_and_upload():
         json=json,
     )
     assert response.status_code == 200
+    time.sleep(WAIT_TIME)
+
+    response = requests.get(
+        BASE_URL + '/logs/2017-08-09-00-00-00/2017-08-10-00-00-00',
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 1
+
+    log = response.json()['logs'][0]
+    assert log['message'] == log_message
+    assert log['level'] == log_level
+    assert log['category'] == log_category
+    assert log['date'] == log_date
