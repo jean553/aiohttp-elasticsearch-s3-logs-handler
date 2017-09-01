@@ -88,12 +88,9 @@ def test_get_logs():
     log_message = 'a second log message'
     log_level = 'a second low level'
     log_category = 'a second category'
-    log_timestamp = 1502885498
 
-    log_datetime = datetime.utcfromtimestamp(log_timestamp)
-    log_date = log_datetime.strftime(
-        '%Y-%m-%dT%H:%M:%S'
-    )
+    log_datetime = datetime.utcfromtimestamp(1502885498)
+    log_date = log_datetime.strftime('%Y-%m-%dT%H:%M:%S')
 
     es_client.create(
         index='data-1-2017-08-01',

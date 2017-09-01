@@ -5,9 +5,15 @@ Functionnal test that checks that:
  - log is removed from elasticsearch after upload to S3
  - log can be downloaded from elasticsearch after upload to S3
 '''
-import requests
+import os
+import time
 
-BASE_URL = 'http://localhost:8000/api/1/service/1'
+from elasticsearch import Elasticsearch
+
+from elasticsearch_client import remove_all_data_indices
+
+ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
+WAIT_TIME = 1
 
 
 def test_post_and_upload():
@@ -15,4 +21,6 @@ def test_post_and_upload():
     Posts a log and tries to get it from elasticsearch,
     executes the upload script and tries to get it from S3
     '''
-    pass
+    es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
+    remove_all_data_indices(es_client)
+    time.sleep(WAIT_TIME)
