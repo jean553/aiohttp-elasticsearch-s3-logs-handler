@@ -9,9 +9,10 @@ import requests
 
 from elasticsearch import Elasticsearch
 
+from elasticsearch_client import remove_all_data_indices
+
 BASE_URL = 'http://localhost:8000/api/1/service/1'
 ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
-ALL_DATA_INDICES = 'data-*'
 WAIT_TIME = 1
 
 
@@ -21,11 +22,7 @@ def test_post_log():
     that the log is inserted into elasticsearch
     '''
     es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
-
-    es_client.delete_by_query(
-        index=ALL_DATA_INDICES,
-        body={},
-    )
+    remove_all_data_indices(es_client)
     time.sleep(WAIT_TIME)
 
     log_timestamp = 1502304972
@@ -85,11 +82,7 @@ def test_get_logs():
     Checks that get logs returns 200 and the expected log content
     '''
     es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
-
-    es_client.delete_by_query(
-        index=ALL_DATA_INDICES,
-        body={}
-    )
+    remove_all_data_indices(es_client)
     time.sleep(WAIT_TIME)
 
     log_message = 'a second log message'
