@@ -67,3 +67,6 @@ def test_post_and_upload():
     assert log['level'] == log_level
     assert log['category'] == log_category
     assert log['date'] == log_date
+
+    # force upload script execution
+    os.system('python /vagrant/build_scripts/scripts/create_snapshot.py')
