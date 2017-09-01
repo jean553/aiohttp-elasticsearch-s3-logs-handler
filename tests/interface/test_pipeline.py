@@ -10,14 +10,34 @@ import time
 from datetime import datetime
 
 import requests
+import boto3
 
 from elasticsearch import Elasticsearch
 
 from elasticsearch_client import remove_all_data_indices
 
 BASE_URL = 'http://localhost:8000/api/1/service/1'
-ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
 WAIT_TIME = 1
+
+ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
+AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
+AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
+S3_ENDPOINT = os.getenv('S3_ENDPOINT')
+S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+
+
+def _empty_s3_bucket():
+    '''
+    Empty the bucket
+    '''
+    resource = boto3.resource(
+        service_name='s3',
+        aws_access_key_id=AWS_ACCESS_KEY,
+        aws_secret_access_key=AWS_SECRET_KEY,
+        endpoint_url='http://%s' % S3_ENDPOINT,
+    )
+    bucket = resource.Bucket(S3_BUCKET_NAME)
+    bucket.objects.all().delete()
 
 
 def test_post_and_upload():
@@ -25,6 +45,8 @@ def test_post_and_upload():
     Posts a log and tries to get it from elasticsearch,
     executes the upload script and tries to get it from S3
     '''
+    _empty_s3_bucket()
+
     es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
     remove_all_data_indices(es_client)
     time.sleep(WAIT_TIME)
