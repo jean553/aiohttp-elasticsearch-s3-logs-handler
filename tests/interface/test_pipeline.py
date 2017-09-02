@@ -19,12 +19,20 @@ from elasticsearch_client import remove_all_data_indices
 WAIT_TIME = 1
 SERVICE_ID = '1'
 BASE_URL = 'http://localhost:8000/api/1/service/' + SERVICE_ID
+SNAPSHOT_COMMAND = 'python /vagrant/build_scripts/scripts/create_snapshot.py'
 
 ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 S3_ENDPOINT = os.getenv('S3_ENDPOINT')
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+
+
+def _execute_snapshot_script():
+    '''
+    Executes the snapshot script
+    '''
+    os.system(SNAPSHOT_COMMAND)
 
 
 def _empty_s3_bucket():
@@ -96,8 +104,7 @@ def test_post_and_upload():
     assert log['category'] == log_category
     assert log['date'] == log_date
 
-    # force upload script execution
-    os.system('python /vagrant/build_scripts/scripts/create_snapshot.py')
+    _execute_snapshot_script()
 
     response = requests.get(
         'http://{}/{}/{}'.format(
@@ -131,6 +138,7 @@ def test_post_and_upload():
     logs_amount = result['hits']['total']
     assert logs_amount == 0, \
         'unexpected logs amount, got %s, expected 0' % logs_amount
+
 
 def test_two_posts_at_different_times_should_only_update_one_to_s3():
     '''
