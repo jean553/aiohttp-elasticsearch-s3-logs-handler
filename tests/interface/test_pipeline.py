@@ -80,10 +80,7 @@ def test_post_and_upload():
         ]
     }
 
-    # we foresee the index right before the POST
-    # because the handler uses the current date
-    date = datetime.now()
-    index = date.strftime('data-{}-%Y-%m-%d'.format(SERVICE_ID))
+    index = log_datetime.strftime('data-{}-%Y-%m-%d'.format(SERVICE_ID))
 
     response = requests.post(
         BASE_URL + '/logs',
@@ -162,8 +159,6 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     first_log_category = 'a first category'
 
     first_log_timestamp = 1502304972
-    first_log_datetime = datetime.utcfromtimestamp(first_log_timestamp)
-    first_log_date = first_log_datetime.strftime('%Y-%m-%dT%H:%M:%S')
 
     first_json = {
         'logs': [
@@ -228,6 +223,7 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     assert len(response.json()['logs']) == 2
 
     _execute_snapshot_script()
+    time.sleep(WAIT_TIME)
 
     response = requests.get(
         '%s/logs/2017-08-09-00-00-00/%04d-%02d-%02d-%02d-%02d-%02d' % (
