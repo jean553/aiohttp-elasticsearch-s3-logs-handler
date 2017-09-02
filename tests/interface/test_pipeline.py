@@ -131,3 +131,89 @@ def test_post_and_upload():
     logs_amount = result['hits']['total']
     assert logs_amount == 0, \
         'unexpected logs amount, got %s, expected 0' % logs_amount
+
+def test_two_posts_at_different_times_should_only_update_one_to_s3():
+    '''
+    Verifies that when two logs are sent into two different indices,
+    very different in time, only one log is sent to S3 at a time.
+
+    TODO: #61 the test is incomplete; we have to execute the snapshot
+    script and verify that one log remains into elasticsearch
+    and one log is part of S3 objects
+    '''
+    _empty_s3_bucket()
+
+    es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
+    remove_all_data_indices(es_client)
+    time.sleep(WAIT_TIME)
+
+    # send the first log on August 9, 2017 06:56:12 pm
+
+    first_log_message = 'a first log message'
+    first_log_level = 'a low level'
+    first_log_category = 'a first category'
+
+    first_log_timestamp = 1502304972
+    first_log_datetime = datetime.utcfromtimestamp(first_log_timestamp)
+    first_log_date = first_log_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+
+    first_json = {
+        'logs': [
+            {
+                'message': first_log_message,
+                'level': first_log_level,
+                'category': first_log_category,
+                'date': str(first_log_timestamp),
+            }
+        ]
+    }
+
+    response = requests.post(
+        BASE_URL + '/logs',
+        json=first_json,
+    )
+    assert response.status_code == 200
+    time.sleep(WAIT_TIME)
+
+    # send the second log at the current date
+    # (in order to be ignored by the snapshot script)
+
+    second_log_message = 'a second log message'
+    second_log_level = 'a low level'
+    second_log_category = 'a second category'
+
+    second_log_datetime = datetime.now()
+    second_log_timestamp = second_log_datetime.timestamp()
+
+    second_json = {
+        'logs': [
+            {
+                'message': second_log_message,
+                'level': second_log_level,
+                'category': second_log_category,
+                'date': str(second_log_timestamp),
+            }
+        ]
+    }
+
+    response = requests.post(
+        BASE_URL + '/logs',
+        json=second_json,
+    )
+    assert response.status_code == 200
+    time.sleep(WAIT_TIME)
+
+    # verifies the two logs are into elasticsearch
+
+    response = requests.get(
+        BASE_URL + '/logs/2017-08-09-00-00-00/%04d-%02d-%02d-%02d-%02d-%02d' % (
+            second_log_datetime.year,
+            second_log_datetime.month,
+            second_log_datetime.day,
+            second_log_datetime.hour,
+            second_log_datetime.minute,
+            second_log_datetime.second,
+        ),
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 2
