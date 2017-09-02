@@ -7,6 +7,8 @@ import requests
 
 import boto3
 
+from elasticsearch import Elasticsearch
+
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 S3_ENDPOINT = os.getenv('S3_ENDPOINT')
@@ -21,7 +23,7 @@ def get_data_indices():
     Returns the list of data indices (data-* format).
 
     Returns:
-        (list) list of indices names
+        (list): list of indices names
     '''
     indices = requests.get(ELASTICSEARCH_ENDPOINT + '/_aliases')
     return [
@@ -38,7 +40,7 @@ def generate_snapshot(index_name):
     and stores it into the snapshots directory.
 
     Args:
-        index_name(str) name of the index
+        index_name(str): name of the index
     '''
     os.system(
         '''
@@ -63,12 +65,29 @@ def upload_snapshot(
 
     Args:
         s3_transfer(boto3.s3.transfer.S3Transfer)
-        index_name(str) name of the index
+        index_name(str): name of the index
     '''
     s3_transfer.upload_file(
         SNAPSHOTS_DIRECTORY + '/' + index_name,
         S3_BUCKET_NAME,
         index_name,
+    )
+
+
+def remove_index(
+    es_client,
+    index_name,
+):
+    '''
+    Removes the given index from elasticsearch.
+
+    Args:
+        es_client(elasticsearch.client.Elasticsearch)
+        index_name(str): name of the index to remove
+    '''
+    es_client.delete_by_query(
+        index=index_name,
+        body={},
     )
 
 
@@ -85,12 +104,18 @@ def main():
     )
     s3_transfer = boto3.s3.transfer.S3Transfer(s3_client)
 
+    es_client = Elasticsearch(['elasticsearch'])
+
     indices = get_data_indices()
 
     for index in indices:
         generate_snapshot(index)
         upload_snapshot(
             s3_transfer,
+            index,
+        )
+        remove_index(
+            es_client,
             index,
         )
 
