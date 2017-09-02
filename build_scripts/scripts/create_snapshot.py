@@ -4,6 +4,7 @@ Creates a snapshot of for one index.
 '''
 import os
 import requests
+from datetime import datetime, timedelta
 
 import boto3
 
@@ -13,9 +14,11 @@ AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 S3_ENDPOINT = os.getenv('S3_ENDPOINT')
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
 
 ELASTICSEARCH_ENDPOINT = 'http://elasticsearch:9200'
 SNAPSHOTS_DIRECTORY = '/tmp/snapshots'
+SNAPSHOT_DAYS_FROM_NOW = 10
 
 
 def get_data_indices():
@@ -25,12 +28,23 @@ def get_data_indices():
     Returns:
         (list): list of indices names
     '''
+    now = datetime.now()
+    snapshot_datetime = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
+
     indices = requests.get(ELASTICSEARCH_ENDPOINT + '/_aliases')
     return [
         index
         for index
         in indices.json()
-        if index[:1] != '.'
+        if (
+            index[:1] != '.' and
+            # takes only the date part of the index name,
+            # turn it into a datetime object, compare interval with now
+            datetime.strptime(
+                '-'.join(index.split('-')[2:]),
+                '%Y-%m-%d',
+            ) <= snapshot_datetime
+        )
     ]
 
 
@@ -104,7 +118,7 @@ def main():
     )
     s3_transfer = boto3.s3.transfer.S3Transfer(s3_client)
 
-    es_client = Elasticsearch(['elasticsearch'])
+    es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
 
     indices = get_data_indices()
 
