@@ -13,6 +13,8 @@ Four containers are included into the project:
 * a Kibana container linked to the ES container (for tests purposes),
 * a fake S3 container for data upload from ES
 
+## Create the service
+
 ```bash
 vagrant up
 ```
