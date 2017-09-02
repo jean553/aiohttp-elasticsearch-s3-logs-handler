@@ -71,6 +71,11 @@ def test_post_and_upload():
         ]
     }
 
+    # we foresee the index right before the POST
+    # because the handler uses the current date
+    date = datetime.now()
+    index = date.strftime('data-1-%Y-%m-%d')
+
     response = requests.post(
         BASE_URL + '/logs',
         json=json,
@@ -92,3 +97,13 @@ def test_post_and_upload():
 
     # force upload script execution
     os.system('python /vagrant/build_scripts/scripts/create_snapshot.py')
+    time.sleep(WAIT_TIME)
+
+    response = requests.get(
+        'http://{}/{}/{}'.format(
+            S3_ENDPOINT,
+            S3_BUCKET_NAME,
+            index,
+        )
+    )
+    assert response.status_code == 200
