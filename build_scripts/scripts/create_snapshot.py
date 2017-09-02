@@ -21,7 +21,7 @@ def get_data_indices():
     Returns the list of data indices (data-* format).
 
     Returns:
-        (list) list of indices names
+        (list): list of indices names
     '''
     indices = requests.get(ELASTICSEARCH_ENDPOINT + '/_aliases')
     return [
@@ -38,7 +38,7 @@ def generate_snapshot(index_name):
     and stores it into the snapshots directory.
 
     Args:
-        index_name(str) name of the index
+        index_name(str): name of the index
     '''
     os.system(
         '''
@@ -63,7 +63,7 @@ def upload_snapshot(
 
     Args:
         s3_transfer(boto3.s3.transfer.S3Transfer)
-        index_name(str) name of the index
+        index_name(str): name of the index
     '''
     s3_transfer.upload_file(
         SNAPSHOTS_DIRECTORY + '/' + index_name,
