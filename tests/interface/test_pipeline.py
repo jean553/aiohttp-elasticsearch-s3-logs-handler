@@ -107,3 +107,26 @@ def test_post_and_upload():
         )
     )
     assert response.status_code == 200
+
+    result = es_client.search(
+        index=index,
+        body={
+            'query': {
+                'bool': {
+                    'must': {
+                        'match': {
+                            'service_id': '1'
+                        },
+                        'match': {
+                            'date': datetime.fromtimestamp(log_timestamp)
+                        }
+                    },
+                }
+            }
+        }
+    )
+
+    # check the index has been deleted from elasticsearch
+    logs_amount = result['hits']['total']
+    assert logs_amount == 0, \
+        'unexpected logs amount, got %s, expected 0' % logs_amount
