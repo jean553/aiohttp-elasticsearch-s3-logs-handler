@@ -1,4 +1,7 @@
 .vagrant/
+.terraform/
+terraform.tfstate
+*.backup
 *.retry
 *.pyc
 *.swp

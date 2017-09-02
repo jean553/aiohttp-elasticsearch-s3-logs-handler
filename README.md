@@ -13,6 +13,8 @@ Four containers are included into the project:
 * a Kibana container linked to the ES container (for tests purposes),
 * a fake S3 container for data upload from ES
 
+## Create the service
+
 ```bash
 vagrant up
 ```
@@ -82,4 +84,24 @@ This test performs a lot of POST requests for many logs from many TSV files.
 
 ```bash
 python tests/performance/performance_test.py
+```
+
+## Launch service into AWS Cloud
+
+You must have an IAM user with `AmazonEC2FullAccess` right.
+
+```bash
+cd build_scripts/terraform
+
+terraform init
+
+terraform plan \
+    -var 'access_key=ACCESS_KEY' \
+    -var 'secret_key=SECRET_KEY' \
+    -var 'region=REGION'
+
+terraform apply \
+    -var 'access_key=ACCESS_KEY' \
+    -var 'secret_key=SECRET_KEY' \
+    -var 'region=REGION'
 ```
