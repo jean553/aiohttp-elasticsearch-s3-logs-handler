@@ -107,6 +107,7 @@ def test_post_and_upload():
         )
     )
     assert response.status_code == 200
+    time.sleep(WAIT_TIME)
 
     result = es_client.search(
         index=index,
