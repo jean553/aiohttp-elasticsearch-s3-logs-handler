@@ -72,6 +72,16 @@ def upload_snapshot(
     )
 
 
+def remove_index(index_name):
+    '''
+    Removes the given index from elasticsearch.
+
+    Args:
+        index_name(str): name of the index to remove
+    '''
+    pass
+
+
 def main():
     '''
     Script entry point.
@@ -93,6 +103,7 @@ def main():
             s3_transfer,
             index,
         )
+        remove_index(index)
 
 
 if __name__ == '__main__':
