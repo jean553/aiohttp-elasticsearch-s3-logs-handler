@@ -141,10 +141,6 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     '''
     Verifies that when two logs are sent into two different indices,
     very different in time, only one log is sent to S3 at a time.
-
-    TODO: #61 the test is incomplete; we have to execute the snapshot
-    script and verify that one log remains into elasticsearch
-    and one log is part of S3 objects
     '''
     _empty_s3_bucket()
 
@@ -159,6 +155,13 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     first_log_category = 'a first category'
 
     first_log_timestamp = 1502304972
+    first_log_datetime = datetime.utcfromtimestamp(first_log_timestamp)
+    first_index = 'data-%s-%04d-%02d-%02d' % (
+        SERVICE_ID,
+        first_log_datetime.year,
+        first_log_datetime.month,
+        first_log_datetime.day,
+    )
 
     first_json = {
         'logs': [
@@ -187,6 +190,12 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
 
     second_log_datetime = datetime.now()
     second_log_timestamp = second_log_datetime.timestamp()
+    second_index = 'data-%s-%04d-%02d-%02d' % (
+        SERVICE_ID,
+        second_log_datetime.year,
+        second_log_datetime.month,
+        second_log_datetime.day,
+    )
 
     second_json = {
         'logs': [
@@ -222,6 +231,8 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     assert response.status_code == 200
     assert len(response.json()['logs']) == 2
 
+    # verifies that only one log remains into elasticsearch after snapshot
+
     _execute_snapshot_script()
     time.sleep(WAIT_TIME)
 
@@ -238,3 +249,25 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 1
+
+    # the first index is supposed to be in S3
+
+    response = requests.get(
+        'http://{}/{}/{}'.format(
+            S3_ENDPOINT,
+            S3_BUCKET_NAME,
+            first_index,
+        )
+    )
+    assert response.status_code == 200
+
+    # the second index is not supposed to be in S3
+
+    response = requests.get(
+        'http://{}/{}/{}'.format(
+            S3_ENDPOINT,
+            S3_BUCKET_NAME,
+            second_index,
+        )
+    )
+    assert response.status_code == 404
