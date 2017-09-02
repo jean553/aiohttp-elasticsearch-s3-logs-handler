@@ -46,13 +46,13 @@ def test_post_log():
     assert response.status_code == 200
     time.sleep(WAIT_TIME)
 
-    now = datetime.now()
+    date = datetime.utcfromtimestamp(log_timestamp)
 
     # format data-1-YYYY-MM-DD
     index = 'data-1-%04d-%02d-%02d' % (
-        now.year,
-        now.month,
-        now.day,
+        date.year,
+        date.month,
+        date.day,
     )
 
     result = es_client.search(
@@ -65,7 +65,7 @@ def test_post_log():
                             'service_id': '1'
                         },
                         'match': {
-                            'date': datetime.fromtimestamp(log_timestamp)
+                            'date': date
                         }
                     },
                 }
@@ -94,7 +94,7 @@ def test_get_logs():
     log_date = log_datetime.strftime('%Y-%m-%dT%H:%M:%S')
 
     es_client.create(
-        index='data-1-2017-08-01',
+        index='data-1-2017-08-16',
         doc_type='logs',
         id='1',
         body={
