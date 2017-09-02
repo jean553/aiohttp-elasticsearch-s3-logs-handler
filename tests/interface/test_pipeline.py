@@ -226,3 +226,19 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 2
+
+    _execute_snapshot_script()
+
+    response = requests.get(
+        '%s/logs/2017-08-09-00-00-00/%04d-%02d-%02d-%02d-%02d-%02d' % (
+            BASE_URL,
+            second_log_datetime.year,
+            second_log_datetime.month,
+            second_log_datetime.day,
+            second_log_datetime.hour,
+            second_log_datetime.minute,
+            second_log_datetime.second,
+        ),
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 1
