@@ -16,8 +16,9 @@ from elasticsearch import Elasticsearch
 
 from elasticsearch_client import remove_all_data_indices
 
-BASE_URL = 'http://localhost:8000/api/1/service/1'
 WAIT_TIME = 1
+SERVICE_ID = '1'
+BASE_URL = 'http://localhost:8000/api/1/service/' + SERVICE_ID
 
 ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
@@ -71,6 +72,11 @@ def test_post_and_upload():
         ]
     }
 
+    # we foresee the index right before the POST
+    # because the handler uses the current date
+    date = datetime.now()
+    index = date.strftime('data-{}-%Y-%m-%d'.format(SERVICE_ID))
+
     response = requests.post(
         BASE_URL + '/logs',
         json=json,
@@ -92,3 +98,12 @@ def test_post_and_upload():
 
     # force upload script execution
     os.system('python /vagrant/build_scripts/scripts/create_snapshot.py')
+
+    response = requests.get(
+        'http://{}/{}/{}'.format(
+            S3_ENDPOINT,
+            S3_BUCKET_NAME,
+            index,
+        )
+    )
+    assert response.status_code == 200
