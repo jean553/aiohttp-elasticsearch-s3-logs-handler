@@ -32,7 +32,10 @@ class PostLogsHandler(AbstractLogsHandler):
         """
         logs = json.loads(self.request.body.decode("utf-8"))["logs"]
 
-        date = datetime.now()
+        # TODO: #59 the index name is created using the first log
+        # date and time; we should create many indices
+        # if logs dates have different days but this should not happen
+        date = datetime.utcfromtimestamp(float(logs[0]["date"]))
         index = date.strftime("data-{}-%Y-%m-%d".format(service_id))
 
         for log in logs:
