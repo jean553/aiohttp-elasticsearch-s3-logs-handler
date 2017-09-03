@@ -11,7 +11,15 @@
         "region": "{{user `region`}}",
         "source_ami": "ami-440d4837", 
         "instance_type": "t2.micro",
-        "ssh_username": "root",
+        "ssh_username": "admin",
         "ami_name": "tornado-kibana-logs-handler_service_ami"
+    }],
+    "provisioners": [{
+        "type": "shell",
+        "inline": [
+            "sleep 60",
+            "sudo apt-get update",
+            "sudo apt-get install -y ansible"
+        ]
     }]
 }
