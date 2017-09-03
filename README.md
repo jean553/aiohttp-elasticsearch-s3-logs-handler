@@ -92,6 +92,8 @@ You must have an IAM user with the following permissions:
  * `AmazonEC2FullAccess`,
  * `AmazonS3FullAccess`
 
+Furthermore, you have to create a key pair file, and using the name as `key_name` below.
+
 The following commands have to be executed into the build scripts folder:
 
 ```bash
@@ -119,11 +121,13 @@ terraform plan \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
-    -var 'service_ami_id=SERVICE_AMI_ID'
+    -var 'service_ami_id=SERVICE_AMI_ID' \
+    -var 'key_name=SSH_KEY_NAME'
 
 terraform apply \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
-    -var 'service_ami_id=SERVICE_AMI_ID'
+    -var 'service_ami_id=SERVICE_AMI_ID' \
+    -var 'key_name=SSH_KEY_NAME'
 ```
