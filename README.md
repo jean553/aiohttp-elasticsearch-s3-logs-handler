@@ -119,11 +119,13 @@ terraform plan \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
-    -var 'service_ami_id=SERVICE_AMI_ID'
+    -var 'service_ami_id=SERVICE_AMI_ID' \
+    -var 'key_name=SSH_KEY_NAME'
 
 terraform apply \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
-    -var 'service_ami_id=SERVICE_AMI_ID'
+    -var 'service_ami_id=SERVICE_AMI_ID' \
+    -var 'key_name=SSH_KEY_NAME'
 ```
