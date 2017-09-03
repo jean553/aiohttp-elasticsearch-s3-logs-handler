@@ -13,5 +13,14 @@
         "instance_type": "t2.micro",
         "ssh_username": "root",
         "ami_name": "tornado-kibana-logs-handler_service_ami"
+    }],
+    "provisioners": [{
+        "type": "shell",
+        "inline": [
+            "sleep 30",
+            "apt-get update",
+            "apt-get upgrade -y",
+            "apt-get install -y ansible"
+        ]
     }]
 }
