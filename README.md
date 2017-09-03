@@ -92,6 +92,8 @@ You must have an IAM user with the following permissions:
  * `AmazonEC2FullAccess`,
  * `AmazonS3FullAccess`
 
+Furthermore, you have to create a key pair file, and using the name as `key_name` below.
+
 The following commands have to be executed into the build scripts folder:
 
 ```bash
