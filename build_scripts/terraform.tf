@@ -1,7 +1,12 @@
+variable "access_key" {}
+variable "secret_key" {}
+variable "region" {}
+variable "service_ami_id" {}
+
 provider "aws" {
-  access_key = "${var.access_key}"
-  secret_key = "${var.secret_key}"
-  region     = "${var.region}"
+  access_key     = "${var.access_key}"
+  secret_key     = "${var.secret_key}"
+  region         = "${var.region}"
 }
 
 resource "aws_instance" "elk" {
@@ -10,7 +15,7 @@ resource "aws_instance" "elk" {
 }
 
 resource "aws_instance" "service" {
-  ami                 = "ami-440d4837" # (community) debian-stretch-amd64-hvm-2016-09-23-08-48-ebs
+  ami                 = "${var.service_ami_id}" # (created by packer.json)
   instance_type       = "t2.micro"
 }
 
