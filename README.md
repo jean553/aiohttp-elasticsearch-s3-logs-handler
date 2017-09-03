@@ -92,19 +92,38 @@ You must have an IAM user with the following permissions:
  * `AmazonEC2FullAccess`,
  * `AmazonS3FullAccess`
 
+The following commands have to be executed into the build scripts folder:
 
 ```bash
-cd build_scripts/terraform
+cd build_scripts
+```
 
+### Create the required AMI with Packer
+
+Packer must be installed on your machine
+(https://www.packer.io/downloads.html).
+
+```bash
+packer build \
+    -var 'access_key=ACCESS_KEY' \
+    -var 'secret_key=SECRET_KEY' \
+    -var 'region=REGION'
+```
+
+### Create the infrastructure with Terraform
+
+```bash
 terraform init
 
 terraform plan \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
-    -var 'region=REGION'
+    -var 'region=REGION' \
+    -var 'service_ami_id=SERVICE_AMI_ID'
 
 terraform apply \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
-    -var 'region=REGION'
+    -var 'region=REGION' \
+    -var 'service_ami_id=SERVICE_AMI_ID'
 ```
