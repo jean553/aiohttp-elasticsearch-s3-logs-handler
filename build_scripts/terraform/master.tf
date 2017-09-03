@@ -13,3 +13,8 @@ resource "aws_instance" "service" {
   ami                 = "ami-440d4837" # (community) debian-stretch-amd64-hvm-2016-09-23-08-48-ebs
   instance_type       = "t2.micro"
 }
+
+resource "aws_s3_bucket" "bucket" {
+  bucket              = "tornado-kibana-logs-handler"
+  acl                 = "private"
+}
