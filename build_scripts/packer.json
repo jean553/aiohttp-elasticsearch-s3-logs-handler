@@ -17,10 +17,9 @@
     "provisioners": [{
         "type": "shell",
         "inline": [
-            "sleep 30",
-            "apt-get update",
-            "apt-get upgrade -y",
-            "apt-get install -y ansible"
+            "sleep 60",
+            "sudo apt-get update",
+            "sudo apt-get install -y ansible"
         ]
     }]
 }
