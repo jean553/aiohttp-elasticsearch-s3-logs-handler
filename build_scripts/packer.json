@@ -14,12 +14,18 @@
         "ssh_username": "admin",
         "ami_name": "tornado-kibana-logs-handler_service_ami"
     }],
-    "provisioners": [{
-        "type": "shell",
-        "inline": [
-            "sleep 60",
-            "sudo apt-get update",
-            "sudo apt-get install -y ansible"
-        ]
-    }]
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sleep 60",
+                "sudo apt-get update",
+                "sudo apt-get install -y ansible"
+            ]
+        },
+        {
+            "type": "ansible-local",
+            "playbook_file": "bootstrap.yml"
+        }
+    ]
 }
