@@ -88,7 +88,10 @@ python tests/performance/performance_test.py
 
 ## Launch service into AWS Cloud
 
-You must have an IAM user with `AmazonEC2FullAccess` right.
+You must have an IAM user with the following permissions:
+ * `AmazonEC2FullAccess`,
+ * `AmazonS3FullAccess`
+
 
 ```bash
 cd build_scripts/terraform
