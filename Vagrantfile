@@ -80,7 +80,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
       ansible.inline = "
         set -e
         cd $APP_PATH
-        ansible-playbook build_scripts/bootstrap.yml
+        ansible-playbook build_scripts/bootstrap-dev.yml
         echo 'done, you can now run `vagrant ssh`'
       "
     end
