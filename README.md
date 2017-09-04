@@ -109,7 +109,8 @@ Packer must be installed on your machine
 packer build \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
-    -var 'region=REGION'
+    -var 'region=REGION' \
+    packer.json
 ```
 
 ### Create the infrastructure with Terraform
