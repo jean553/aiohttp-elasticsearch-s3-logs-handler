@@ -35,3 +35,20 @@
       git:
         repo: https://github.com/jean553/tornado-kibana-logs-handler.git
         dest: /opt/tornado-kibana-logs-handler
+
+    - name: install pip packages tox
+      pip:
+        name="tox"
+        state=latest
+
+    - name: create tox environment
+      shell: >
+        tox -r -e devdocker
+      args:
+        chdir: "/opt/tornado-kibana-logs-handler"
+        creates: "/tmp/virtual_env35"
+
+    - name: install elasticdump using npm
+      npm:
+        name: elasticdump
+        global: yes
