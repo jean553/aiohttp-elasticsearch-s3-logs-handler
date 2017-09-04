@@ -16,9 +16,15 @@
     }],
     "provisioners": [
         {
+            "type": "file",
+            "destination": "/tmp/sources.list",
+            "source": "./service_sources.list"
+        },
+        {
             "type": "shell",
             "inline": [
                 "sleep 60",
+                "sudo mv /tmp/sources.list /etc/apt/sources.list",
                 "sudo apt-get update",
                 "sudo apt-get install -y ansible"
             ]
