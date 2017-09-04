@@ -4,15 +4,16 @@
 
   tasks:
 
-    - name: install basic tools git and curl
+    - name: install basic tools (git, curl, pip)
       apt:
         name: "{{ item }}"
         state: present
-        # cache already updated by ansible installation
-        update_cache: no
+        update_cache: yes
       with_items:
         - git
         - curl
+        - python3.5
+        - python-pip
 
     # npm is required by elasticdump and is not part of Debian stretch
     # repositories so we have to install it manually;
@@ -28,10 +29,27 @@
 
     - name: create project directory
       file:
-        path: /opt/tornado-kibana-logs-handler
+        path: /opt/applications/tornado-kibana-logs-handler
         state: directory
 
     - name: clone project
       git:
         repo: https://github.com/jean553/tornado-kibana-logs-handler.git
-        dest: /opt/tornado-kibana-logs-handler
+        dest: /opt/applications/tornado-kibana-logs-handler
+
+    - name: install pip packages tox
+      pip:
+        name="tox"
+        state=latest
+
+    - name: create tox environment
+      shell: >
+        tox -r -e devdocker
+      args:
+        chdir: "/opt/applications/tornado-kibana-logs-handler"
+        creates: "/opt/virtual_env35"
+
+    - name: install elasticdump using npm
+      npm:
+        name: elasticdump
+        global: yes
