@@ -33,7 +33,8 @@
 
     - name: clone project
       git:
-        repo: https://github.com/jean553/tornado-kibana-logs-handler.git
+        # XXX: clone from master
+        repo: https://github.com/jean553/tornado-kibana-logs-handler.git?branch=fix_readme_error_into_aws_section
         dest: /opt/tornado-kibana-logs-handler
 
     - name: install pip packages tox
