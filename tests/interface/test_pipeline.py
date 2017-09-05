@@ -215,6 +215,30 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     assert response.status_code == 200
     time.sleep(WAIT_TIME)
 
+    # check there is two indices into ES
+
+    result = es_client.search(
+        index='data-1-2017-08-09',
+        body={}
+    )
+
+    logs_amount = result['hits']['total']
+    assert logs_amount == 1, \
+        'unexpected logs amount, got %s, expected 1' % logs_amount
+
+    result = es_client.search(
+        index='data-1-%04d-%02d-%02d' % (
+            second_log_datetime.year,
+            second_log_datetime.month,
+            second_log_datetime.day,
+        ),
+        body={}
+    )
+
+    logs_amount = result['hits']['total']
+    assert logs_amount == 1, \
+        'unexpected logs amount, got %s, expected 1' % logs_amount
+
     # verifies the two logs are into elasticsearch
 
     response = requests.get(
