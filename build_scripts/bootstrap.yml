@@ -44,7 +44,7 @@
 
     - name: create tox environment
       shell: >
-        tox -r -e devdocker
+        tox -r -e aws
       args:
         chdir: "/opt/applications/tornado-kibana-logs-handler"
         creates: "/opt/virtual_env35"
