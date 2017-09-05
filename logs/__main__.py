@@ -8,6 +8,7 @@ from logs.config import ELASTICSEARCH_HOSTNAME
 from logs.config import REGION_NAME
 from logs.config import AWS_SECRET_KEY
 from logs.config import AWS_ACCESS_KEY
+from logs.config import S3_ENDPOINT
 
 from logs.post_logs_handler import PostLogsHandler
 from logs.get_logs_handler import GetLogsHandler
@@ -25,10 +26,12 @@ def main():
         region_name=REGION_NAME,
         aws_secret_access_key=AWS_SECRET_KEY,
         aws_access_key_id=AWS_ACCESS_KEY,
+        endpoint_url=S3_ENDPOINT,
     )
 
     context = {
         'es_client': es_client,
+        's3_client': s3_client,
     }
 
     app = tornado.web.Application(

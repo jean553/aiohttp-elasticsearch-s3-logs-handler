@@ -15,11 +15,13 @@ class AbstractLogsHandler(tornado.web.RequestHandler):
     def initialize(
             self,
             es_client,
+            s3_client,
     ):
         """
         Initializes the received request handling process.
         """
         self.es_client = es_client
+        self.s3_client = s3_client
 
     def data_received(
             self,
