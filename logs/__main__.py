@@ -1,6 +1,7 @@
 """Main module
 """
 import tornado
+import aiobotocore
 from elasticsearch import Elasticsearch
 
 from logs.config import ELASTICSEARCH_HOSTNAME

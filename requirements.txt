@@ -1,6 +1,7 @@
 elasticsearch
 tornado
 boto3
+aiobotocore
 elasticsearch-curator
 
 # for dev
