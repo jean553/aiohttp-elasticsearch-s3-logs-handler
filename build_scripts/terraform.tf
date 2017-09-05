@@ -66,9 +66,9 @@ resource "aws_internet_gateway" "vpc_gateway" {
   }
 }
 
-resource "aws_route_table" "vpc_route_table" {
+resource "aws_default_route_table" "vpc_default_route_table" {
   
-  vpc_id              = "${aws_vpc.vpc.id}"
+  default_route_table_id = "${aws_vpc.vpc.default_route_table_id}"
 
   route {
     cidr_block        = "0.0.0.0/0"
@@ -76,7 +76,7 @@ resource "aws_route_table" "vpc_route_table" {
   }
 
   tags {
-    Name              = "tornado-kibana-logs-handler_vpc_route_table"
+    Name              = "tornado-kibana-logs-handler_vpc_default_route_table"
   }
 }
 
