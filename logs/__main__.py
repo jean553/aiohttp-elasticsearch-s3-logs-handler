@@ -8,6 +8,7 @@ from logs.config import ELASTICSEARCH_HOSTNAME
 from logs.post_logs_handler import PostLogsHandler
 from logs.get_logs_handler import GetLogsHandler
 
+
 def main():
     """
     Starts the tornado server
@@ -26,6 +27,7 @@ def main():
     )
     app.listen(8000)
     tornado.ioloop.IOLoop.current().start()
+
 
 if __name__ == "__main__":
     main()
