@@ -15,3 +15,5 @@ assert AWS_SECRET_KEY is not None
 
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 assert AWS_ACCESS_KEY is not None
+
+S3_ENDPOINT = os.getenv('S3_ENDPOINT')

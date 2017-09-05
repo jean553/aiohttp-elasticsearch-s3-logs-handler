@@ -26,7 +26,8 @@ def main():
         region_name=REGION_NAME,
         aws_secret_access_key=AWS_SECRET_KEY,
         aws_access_key_id=AWS_ACCESS_KEY,
-        endpoint_url=S3_ENDPOINT,
+        # FIXME: #78 the AWS version should not have this param
+        endpoint_url='http://{}'.format(S3_ENDPOINT),
     )
 
     context = {
