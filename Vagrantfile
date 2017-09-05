@@ -22,6 +22,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     # add your credentials here
     "AWS_ACCESS_KEY" => "dummy",
     "AWS_SECRET_KEY" => "dummy",
+    "REGION_NAME" => "dummy",
     "S3_BUCKET_NAME" => S3_BUCKET_NAME,
     "S3_ENDPOINT" => S3_ENDPOINT
   }

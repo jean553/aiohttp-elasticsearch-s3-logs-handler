@@ -215,6 +215,30 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     assert response.status_code == 200
     time.sleep(WAIT_TIME)
 
+    # check there is two indices into ES
+
+    result = es_client.search(
+        index='data-1-2017-08-09',
+        body={}
+    )
+
+    logs_amount = result['hits']['total']
+    assert logs_amount == 1, \
+        'unexpected logs amount, got %s, expected 1' % logs_amount
+
+    result = es_client.search(
+        index='data-1-%04d-%02d-%02d' % (
+            second_log_datetime.year,
+            second_log_datetime.month,
+            second_log_datetime.day,
+        ),
+        body={}
+    )
+
+    logs_amount = result['hits']['total']
+    assert logs_amount == 1, \
+        'unexpected logs amount, got %s, expected 1' % logs_amount
+
     # verifies the two logs are into elasticsearch
 
     response = requests.get(
@@ -235,20 +259,6 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
 
     _execute_snapshot_script()
     time.sleep(WAIT_TIME)
-
-    response = requests.get(
-        '%s/logs/2017-08-09-00-00-00/%04d-%02d-%02d-%02d-%02d-%02d' % (
-            BASE_URL,
-            second_log_datetime.year,
-            second_log_datetime.month,
-            second_log_datetime.day,
-            second_log_datetime.hour,
-            second_log_datetime.minute,
-            second_log_datetime.second,
-        ),
-    )
-    assert response.status_code == 200
-    assert len(response.json()['logs']) == 1
 
     # the first index is supposed to be in S3
 
@@ -271,3 +281,44 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
         )
     )
     assert response.status_code == 404
+
+    # check there is only one index remaining into ES
+
+    result = es_client.search(
+        index='data-1-2017-08-09',
+        body={}
+    )
+
+    logs_amount = result['hits']['total']
+    assert logs_amount == 0, \
+        'unexpected logs amount, got %s, expected 0' % logs_amount
+
+    result = es_client.search(
+        index='data-1-%04d-%02d-%02d' % (
+            second_log_datetime.year,
+            second_log_datetime.month,
+            second_log_datetime.day,
+        ),
+        body={}
+    )
+
+    logs_amount = result['hits']['total']
+    assert logs_amount == 1, \
+        'unexpected logs amount, got %s, expected 1' % logs_amount
+
+    # verifies the GET API still returns two logs
+
+    response = requests.get(
+        '%s/logs/2017-08-09-00-00-00/%04d-%02d-%02d-%02d-%02d-%02d' % (
+            BASE_URL,
+            second_log_datetime.year,
+            second_log_datetime.month,
+            second_log_datetime.day,
+            second_log_datetime.hour,
+            second_log_datetime.minute,
+            second_log_datetime.second,
+        ),
+    )
+    assert response.status_code == 200
+    #FIXME: should be 2 !
+    assert len(response.json()['logs']) == 1

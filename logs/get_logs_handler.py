@@ -1,11 +1,12 @@
 """
 GET logs handler.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from logs.abstract_handler import AbstractLogsHandler
 
 DATE_FORMAT = "%Y-%m-%d-%H-%M-%S"
+SNAPSHOT_DAYS_FROM_NOW = 10
 
 
 # a class is supposed to contain at least more than one public method;
@@ -66,5 +67,10 @@ class GetLogsHandler(AbstractLogsHandler):
         logs_without_metadata = list()
         for log in logs:
             logs_without_metadata.append(log["_source"])
+
+        now = datetime.now()
+        last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
+        if end > last_snapshot_date:
+            pass
 
         self.write({"logs": logs_without_metadata})
