@@ -14,3 +14,4 @@ def remove_all_data_indices(es_client):
         index='data-*',
         body={},
     )
+    es_client.indices.delete(index='data-*')
