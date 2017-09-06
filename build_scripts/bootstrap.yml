@@ -4,12 +4,14 @@
 
   tasks:
 
-    - name: install basic tools (git, curl, pip)
+    - name: install basic tools (supervisor, nginx, git, curl, pip)
       apt:
         name: "{{ item }}"
         state: present
         update_cache: yes
       with_items:
+        - supervisor
+        - nginx
         - git
         - curl
         - python3.5
