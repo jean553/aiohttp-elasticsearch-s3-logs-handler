@@ -1,9 +1,15 @@
 """
 GET logs handler.
 """
+import json
 from datetime import datetime, timedelta
 
+import requests
+
 from logs.abstract_handler import AbstractLogsHandler
+
+from logs.config import S3_ENDPOINT
+from logs.config import S3_BUCKET_NAME
 
 DATE_FORMAT = "%Y-%m-%d-%H-%M-%S"
 SNAPSHOT_DAYS_FROM_NOW = 10
@@ -71,6 +77,21 @@ class GetLogsHandler(AbstractLogsHandler):
         now = datetime.now()
         last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
         if end > last_snapshot_date:
-            pass
+
+            # TODO: #80 this feature must be non-blocking asynchronous
+            response = requests.get(
+                'http://{}/{}/{}'.format(
+                    S3_ENDPOINT,
+                    S3_BUCKET_NAME,
+                    # FIXME: #81 hard coded value only for tests purposes;
+                    # every concerned indices must be requested
+                    'data-1-2017-08-09',
+                )
+            )
+
+            if response.status_code == 200:
+                logs_without_metadata.append(
+                    json.loads(response.text)["_source"]
+                )
 
         self.write({"logs": logs_without_metadata})
