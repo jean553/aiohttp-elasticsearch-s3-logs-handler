@@ -17,3 +17,4 @@ AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 assert AWS_ACCESS_KEY is not None
 
 S3_ENDPOINT = os.getenv('S3_ENDPOINT')
+S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')

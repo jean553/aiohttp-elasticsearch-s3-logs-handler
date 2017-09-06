@@ -320,5 +320,4 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
         ),
     )
     assert response.status_code == 200
-    #FIXME: should be 2 !
-    assert len(response.json()['logs']) == 1
+    assert len(response.json()['logs']) == 2
