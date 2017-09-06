@@ -76,22 +76,36 @@ class GetLogsHandler(AbstractLogsHandler):
 
         now = datetime.now()
         last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
-        if end > last_snapshot_date:
+        if start <= last_snapshot_date:
 
-            # TODO: #80 this feature must be non-blocking asynchronous
-            response = requests.get(
-                'http://{}/{}/{}'.format(
-                    S3_ENDPOINT,
-                    S3_BUCKET_NAME,
-                    # FIXME: #81 hard coded value only for tests purposes;
-                    # every concerned indices must be requested
-                    'data-1-2017-08-09',
-                )
-            )
+            s3_index_date = start
 
-            if response.status_code == 200:
-                logs_without_metadata.append(
-                    json.loads(response.text)["_source"]
+            while s3_index_date <= last_snapshot_date:
+
+                s3_index = "data-%s-%04d-%02d-%02d" % (
+                    service_id,
+                    s3_index_date.year,
+                    s3_index_date.month,
+                    s3_index_date.day,
                 )
 
+                # TODO: #80 this feature must be non-blocking asynchronous
+                response = requests.get(
+                    'http://{}/{}/{}'.format(
+                        S3_ENDPOINT,
+                        S3_BUCKET_NAME,
+                        s3_index,
+                    )
+                )
+
+                if response.status_code == 200:
+                    logs_without_metadata.append(
+                        json.loads(response.text)["_source"]
+                    )
+
+                s3_index_date += timedelta(days=1)
+
+        # TODO: #83 result must be streamed to the client
+        # TODO: #84 logs are only filtered by day,
+        # filters must applied on hours, minutes, seconds
         self.write({"logs": logs_without_metadata})
