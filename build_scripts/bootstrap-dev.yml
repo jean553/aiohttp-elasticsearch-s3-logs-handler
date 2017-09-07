@@ -4,41 +4,41 @@
 
   tasks:
 
-    - name: install npm (required to install elasticdump)
+    - name: npm installed (required for elasticdump)
       apt:
         name: npm
         state: present
         update_cache: yes
 
-    - name: install pip packages tox
+    - name: tox installed
       pip:
         name="tox"
         state=latest
 
-    - name: create tox environment
+    - name: tox environment created
       shell: >
         tox -r -e {{ ansible_env.ENV_NAME }}
       args:
         chdir: "{{ ansible_env.APP_PATH }}"
         creates: "{{ ansible_env.VIRTUAL_ENV_PATH }}"
 
-    - name: install elasticdump using npm
+    - name: elasticdump installed
       npm:
         name: elasticdump
         global: yes
 
-    - name: copy folder destination and virtualenv activation when ssh
+    - name: zsh file configured (automatic cd into project directory and python virtualenv)
       lineinfile:
         path: /home/vagrant/.zshrc
         line: "cd /vagrant && source /tmp/virtual_env35/bin/activate"
 
-    - name: call elasticsearch API for data indices template creation
+    - name: elasticsearch template created
       script: ./scripts/create_template.sh
 
-    - name: create a bucket on S3
+    - name: S3 bucket created
       shell: "{{ ansible_env.VIRTUAL_ENV_PATH }}/bin/python {{ ansible_env.APP_PATH }}/build_scripts/scripts/create_bucket.py"
 
-    - name: create cron task in order to execute automatic indices backup to s3
+    - name: automatic s3 snapshot cron task created
       cron:
         name: "automatic indices snapshot to s3"
         minute: "0"
@@ -46,13 +46,13 @@
         cron_file: /etc/cron.d/snapshot
         user: root
 
-    - name: make link between node and nodejs in order to let elasticdump finds node
+    - name: link created between node and nodejs (name issue workaround)
       file:
         src: /usr/bin/nodejs
         dest: /usr/bin/node
         state: link
 
-    - name: create the snapshots directory
+    - name: snapshots directory created
       file:
         path: /tmp/snapshots
         state: directory
