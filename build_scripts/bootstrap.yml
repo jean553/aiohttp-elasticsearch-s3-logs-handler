@@ -4,7 +4,7 @@
 
   tasks:
 
-    - name: install basic tools (supervisor, nginx, git, curl, pip)
+    - name: basic tools installed (supervisor, nginx, git, curl, pip)
       apt:
         name: "{{ item }}"
         state: present
@@ -21,37 +21,37 @@
     # repositories so we have to install it manually;
     # we install it through the nodejs package from node repo
 
-    - name: add node repositories for npm installation
+    - name: node repositories activated (for npm download)
       shell: curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 
-    - name: install npm (required by elasticdump)
+    - name: npm installed (required by elasticdump)
       apt:
         name: nodejs
         state: present
 
-    - name: create project directory
+    - name: project directory created
       file:
         path: /opt/applications/tornado-kibana-logs-handler
         state: directory
 
-    - name: clone project
+    - name: tornado-kibana-logs-handler project cloned
       git:
         repo: https://github.com/jean553/tornado-kibana-logs-handler.git
         dest: /opt/applications/tornado-kibana-logs-handler
 
-    - name: install pip packages tox
+    - name: pip packages installed using tox
       pip:
         name="tox"
         state=latest
 
-    - name: create tox environment
+    - name: tox environment created
       shell: >
         tox -r -e aws
       args:
         chdir: "/opt/applications/tornado-kibana-logs-handler"
         creates: "/opt/virtual_env35"
 
-    - name: install elasticdump using npm
+    - name: elasticdump installed using npm
       npm:
         name: elasticdump
         global: yes
