@@ -69,6 +69,8 @@ class GetLogsHandler(AbstractLogsHandler):
             }
         )
 
+        self.write('{"logs":')
+
         logs = result["hits"]["hits"]
         logs_without_metadata = list()
         for log in logs:
@@ -108,4 +110,9 @@ class GetLogsHandler(AbstractLogsHandler):
         # TODO: #83 result must be streamed to the client
         # TODO: #84 logs are only filtered by day,
         # filters must applied on hours, minutes, seconds
-        self.write({"logs": logs_without_metadata})
+
+        # TODO: #89 e replace single quotes by double quotes in order to
+        # return a valid JSON to the client even if the response content-type
+        # is not JSON
+        self.write(str(logs_without_metadata).replace("'", '"'))
+        self.write('}')
