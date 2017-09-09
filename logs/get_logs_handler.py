@@ -1,6 +1,6 @@
-"""
+'''
 GET logs handler.
-"""
+'''
 import json
 from datetime import datetime, timedelta
 
@@ -11,7 +11,7 @@ from logs.abstract_handler import AbstractLogsHandler
 from logs.config import S3_ENDPOINT
 from logs.config import S3_BUCKET_NAME
 
-DATE_FORMAT = "%Y-%m-%d-%H-%M-%S"
+DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
 SNAPSHOT_DAYS_FROM_NOW = 10
 
 
@@ -23,19 +23,19 @@ SNAPSHOT_DAYS_FROM_NOW = 10
 # (def get(self))
 # pylint: disable=arguments-differ
 class GetLogsHandler(AbstractLogsHandler):
-    """
+    '''
     Get logs handler.
-    """
+    '''
 
     def get(
-            self,
-            service_id,
-            start_date,
-            end_date,
+        self,
+        service_id,
+        start_date,
+        end_date,
     ):
-        """
+        '''
         Get /logs action.
-        """
+        '''
         start = datetime.strptime(
             start_date,
             DATE_FORMAT,
@@ -47,20 +47,20 @@ class GetLogsHandler(AbstractLogsHandler):
         )
 
         result = self.es_client.search(
-            index="data-{}-*".format(service_id),
+            index='data-{}-*'.format(service_id),
             body={
-                "query": {
-                    "bool": {
-                        "must": {
-                            "match": {
-                                "service_id": service_id
+                'query': {
+                    'bool': {
+                        'must': {
+                            'match': {
+                                'service_id': service_id
                             }
                         },
-                        "filter": {
-                            "range": {
-                                "date": {
-                                    "gte": start,
-                                    "lte": end
+                        'filter': {
+                            'range': {
+                                'date': {
+                                    'gte': start,
+                                    'lte': end
                                 }
                             }
                         }
@@ -71,10 +71,10 @@ class GetLogsHandler(AbstractLogsHandler):
 
         self.write('{"logs":')
 
-        logs = result["hits"]["hits"]
+        logs = result['hits']['hits']
         logs_without_metadata = list()
         for log in logs:
-            logs_without_metadata.append(log["_source"])
+            logs_without_metadata.append(log['_source'])
 
         now = datetime.now()
         last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
@@ -84,7 +84,7 @@ class GetLogsHandler(AbstractLogsHandler):
 
             while s3_index_date <= last_snapshot_date:
 
-                s3_index = "data-%s-%04d-%02d-%02d" % (
+                s3_index = 'data-%s-%04d-%02d-%02d' % (
                     service_id,
                     s3_index_date.year,
                     s3_index_date.month,
@@ -102,7 +102,7 @@ class GetLogsHandler(AbstractLogsHandler):
 
                 if response.status_code == 200:
                     logs_without_metadata.append(
-                        json.loads(response.text)["_source"]
+                        json.loads(response.text)['_source']
                     )
 
                 s3_index_date += timedelta(days=1)
