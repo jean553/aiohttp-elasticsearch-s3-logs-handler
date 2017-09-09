@@ -1,5 +1,6 @@
-"""Main module
-"""
+'''
+Main module
+'''
 import tornado
 import aiobotocore
 from elasticsearch import Elasticsearch
@@ -15,9 +16,11 @@ from logs.get_logs_handler import GetLogsHandler
 
 
 def main():
-    """
+    '''
     Starts the tornado server
-    """
+
+    TODO: #94 handle graceful shutdown
+    '''
     es_client = Elasticsearch(hosts=[ELASTICSEARCH_HOSTNAME],)
 
     session = aiobotocore.get_session()
@@ -37,13 +40,22 @@ def main():
 
     app = tornado.web.Application(
         [
-            (r"/api/1/service/(.*)/logs", PostLogsHandler, context),
-            (r"/api/1/service/(.*)/logs/(.*)/(.*)", GetLogsHandler, context)
+            (
+                r'/api/1/service/(.*)/logs',
+                PostLogsHandler,
+                context,
+            ),
+            (
+                r'/api/1/service/(.*)/logs/(.*)/(.*)',
+                GetLogsHandler,
+                context,
+            )
         ]
     )
+    # TODO: #93 the port should be an environment variable
     app.listen(8000)
     tornado.ioloop.IOLoop.current().start()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
