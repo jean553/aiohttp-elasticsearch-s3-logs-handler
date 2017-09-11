@@ -82,10 +82,11 @@ class GetLogsHandler(AbstractLogsHandler):
         self.write('{"logs": [')
 
         logs = result['hits']['hits']
-        last_elasticsearch_log_index = len(logs) - 1
+        elasticsearch_logs_amount = len(logs)
+        last_elasticsearch_log_index = elasticsearch_logs_amount - 1
         first_iteration = True
 
-        if len(logs) > 0:
+        if elasticsearch_logs_amount > 0:
             first_iteration = False
 
         for counter, log in enumerate(logs):
