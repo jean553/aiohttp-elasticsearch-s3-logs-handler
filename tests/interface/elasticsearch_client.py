@@ -2,13 +2,12 @@
 Elasticsearch client routines for tests
 '''
 
+from elasticsearch.client import Elasticsearch
 
-def remove_all_data_indices(es_client):
+
+def remove_all_data_indices(es_client: Elasticsearch):
     '''
     Removes all the data-* indices.
-
-    Args:
-        es_client(elasticsearch.client.Elasticsearch)
     '''
     es_client.delete_by_query(
         index='data-*',

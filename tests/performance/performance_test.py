@@ -25,8 +25,8 @@ SECONDS_INTERVAL = 60
 
 
 async def send_data(
-    json,
-    service_id,
+    json: dict,
+    service_id: str,
 ):
     '''
     Posts data to the service.
