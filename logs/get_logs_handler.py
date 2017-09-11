@@ -131,5 +131,4 @@ class GetLogsHandler(AbstractLogsHandler):
         # TODO: #89 replace single quotes by double quotes in order to
         # return a valid JSON to the client even if the response content-type
         # is not JSON
-        #self.write(str(logs_without_metadata).replace("'", '"'))
         self.write(']}')
