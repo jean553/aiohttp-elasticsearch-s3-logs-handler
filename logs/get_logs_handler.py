@@ -3,6 +3,7 @@ GET logs handler.
 '''
 import json
 from datetime import datetime, timedelta
+from typing import Any
 
 import requests
 
@@ -13,6 +14,15 @@ from logs.config import S3_BUCKET_NAME
 
 DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
 SNAPSHOT_DAYS_FROM_NOW = 10
+
+
+def get_log_to_string(log: Any) -> str:
+    '''
+    Returns a string representation of the given log.
+    Convert single quotes to double quotes in order to match with JSON format
+    (required for streaming)
+    '''
+    return str(log['_source']).replace("'", '"')
 
 
 # a class is supposed to contain at least more than one public method;
@@ -79,7 +89,7 @@ class GetLogsHandler(AbstractLogsHandler):
             first_iteration = False
 
         for counter, log in enumerate(logs):
-            line = str(log['_source']).replace("'", '"')
+            line = get_log_to_string(log)
 
             if counter != last_elasticsearch_log_index:
                 line += ','
@@ -118,7 +128,7 @@ class GetLogsHandler(AbstractLogsHandler):
                         line += ','
                         first_iteration = False
 
-                    line += str(json.loads(response.text)['_source']).replace("'", '"')
+                    line += get_log_to_string(json.loads(response.text))
                     self.write(line)
                     self.flush()
 
