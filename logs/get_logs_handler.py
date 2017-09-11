@@ -114,6 +114,8 @@ class GetLogsHandler(AbstractLogsHandler):
                 )
 
                 # TODO: #80 this feature must be non-blocking asynchronous
+                # boto3 non-blocking and streaming feature must be used here
+                # and linked to the self.write() feature below
                 response = requests.get(
                     'http://{}/{}/{}'.format(
                         S3_ENDPOINT,
