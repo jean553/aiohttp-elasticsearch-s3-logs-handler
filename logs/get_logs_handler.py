@@ -73,7 +73,6 @@ class GetLogsHandler(AbstractLogsHandler):
 
         logs = result['hits']['hits']
         last_elasticsearch_log_index = len(logs) - 1
-        logs_without_metadata = list()
         first_iteration = True
 
         if len(logs) > 0:
