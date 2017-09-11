@@ -25,7 +25,7 @@ class PostLogsHandler(AbstractLogsHandler):
     # pylint: disable=arguments-differ
     def post(
         self,
-        service_id,
+        service_id: str,
     ):
         '''
         Post /logs action.

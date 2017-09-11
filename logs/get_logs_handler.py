@@ -29,9 +29,9 @@ class GetLogsHandler(AbstractLogsHandler):
 
     def get(
         self,
-        service_id,
-        start_date,
-        end_date,
+        service_id: str,
+        start_date: str,
+        end_date: str,
     ):
         '''
         Get /logs action.
