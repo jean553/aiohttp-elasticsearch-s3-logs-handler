@@ -74,6 +74,10 @@ class GetLogsHandler(AbstractLogsHandler):
         logs = result['hits']['hits']
         last_elasticsearch_log_index = len(logs) - 1
         logs_without_metadata = list()
+        first_iteration = True
+
+        if len(logs) > 0:
+            first_iteration = False
 
         for counter, log in enumerate(logs):
             line = str(log['_source']).replace("'", '"')
@@ -82,6 +86,7 @@ class GetLogsHandler(AbstractLogsHandler):
                 line += ','
 
             self.write(line)
+            self.flush()
 
         now = datetime.now()
         last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
@@ -109,17 +114,17 @@ class GetLogsHandler(AbstractLogsHandler):
 
                 if response.status_code == 200:
 
-                    print('----')
-                    print(response.text)
-                    print(json.loads(response.text)['_source'])
+                    line = ''
+                    if not first_iteration:
+                        line += ','
+                        first_iteration = False
 
-                    logs_without_metadata.append(
-                        json.loads(response.text)['_source']
-                    )
+                    line += str(json.loads(response.text)['_source']).replace("'", '"')
+                    self.write(line)
+                    self.flush()
 
                 s3_index_date += timedelta(days=1)
 
-        # TODO: #83 result must be streamed to the client
         # TODO: #84 logs are only filtered by day,
         # filters must applied on hours, minutes, seconds
 
