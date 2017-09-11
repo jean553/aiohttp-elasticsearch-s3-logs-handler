@@ -3,6 +3,7 @@ GET logs handler.
 '''
 import json
 from datetime import datetime, timedelta
+from typing import Any
 
 import requests
 
@@ -13,6 +14,15 @@ from logs.config import S3_BUCKET_NAME
 
 DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
 SNAPSHOT_DAYS_FROM_NOW = 10
+
+
+def get_log_to_string(log: Any) -> str:
+    '''
+    Returns a string representation of the given log.
+    Convert single quotes to double quotes in order to match with JSON format
+    (required for streaming)
+    '''
+    return str(log['_source']).replace("'", '"')
 
 
 # a class is supposed to contain at least more than one public method;
@@ -69,12 +79,24 @@ class GetLogsHandler(AbstractLogsHandler):
             }
         )
 
-        self.write('{"logs":')
+        self.write('{"logs": [')
 
         logs = result['hits']['hits']
-        logs_without_metadata = list()
-        for log in logs:
-            logs_without_metadata.append(log['_source'])
+        elasticsearch_logs_amount = len(logs)
+        last_elasticsearch_log_index = elasticsearch_logs_amount - 1
+        first_iteration = True
+
+        if elasticsearch_logs_amount > 0:
+            first_iteration = False
+
+        for counter, log in enumerate(logs):
+            line = get_log_to_string(log)
+
+            if counter != last_elasticsearch_log_index:
+                line += ','
+
+            self.write(line)
+            self.flush()
 
         now = datetime.now()
         last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
@@ -92,6 +114,8 @@ class GetLogsHandler(AbstractLogsHandler):
                 )
 
                 # TODO: #80 this feature must be non-blocking asynchronous
+                # boto3 non-blocking and streaming feature must be used here
+                # and linked to the self.write() feature below
                 response = requests.get(
                     'http://{}/{}/{}'.format(
                         S3_ENDPOINT,
@@ -101,18 +125,22 @@ class GetLogsHandler(AbstractLogsHandler):
                 )
 
                 if response.status_code == 200:
-                    logs_without_metadata.append(
-                        json.loads(response.text)['_source']
-                    )
+
+                    line = ''
+                    if not first_iteration:
+                        line += ','
+                        first_iteration = False
+
+                    line += get_log_to_string(json.loads(response.text))
+                    self.write(line)
+                    self.flush()
 
                 s3_index_date += timedelta(days=1)
 
-        # TODO: #83 result must be streamed to the client
         # TODO: #84 logs are only filtered by day,
         # filters must applied on hours, minutes, seconds
 
         # TODO: #89 replace single quotes by double quotes in order to
         # return a valid JSON to the client even if the response content-type
         # is not JSON
-        self.write(str(logs_without_metadata).replace("'", '"'))
-        self.write('}')
+        self.write(']}')
