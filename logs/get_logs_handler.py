@@ -69,12 +69,19 @@ class GetLogsHandler(AbstractLogsHandler):
             }
         )
 
-        self.write('{"logs":')
+        self.write('{"logs": [')
 
         logs = result['hits']['hits']
+        last_elasticsearch_log_index = len(logs) - 1
         logs_without_metadata = list()
-        for log in logs:
-            logs_without_metadata.append(log['_source'])
+
+        for counter, log in enumerate(logs):
+            line = str(log['_source']).replace("'", '"')
+
+            if counter != last_elasticsearch_log_index:
+                line += ','
+
+            self.write(line)
 
         now = datetime.now()
         last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
@@ -101,6 +108,11 @@ class GetLogsHandler(AbstractLogsHandler):
                 )
 
                 if response.status_code == 200:
+
+                    print('----')
+                    print(response.text)
+                    print(json.loads(response.text)['_source'])
+
                     logs_without_metadata.append(
                         json.loads(response.text)['_source']
                     )
@@ -114,5 +126,5 @@ class GetLogsHandler(AbstractLogsHandler):
         # TODO: #89 replace single quotes by double quotes in order to
         # return a valid JSON to the client even if the response content-type
         # is not JSON
-        self.write(str(logs_without_metadata).replace("'", '"'))
-        self.write('}')
+        #self.write(str(logs_without_metadata).replace("'", '"'))
+        self.write(']}')
