@@ -1,0 +1,33 @@
+'''
+Starts the service.
+'''
+
+from aiohttp import web
+
+# TODO: #99 tornado must be replaced by asyncio,
+# after that, the module can be renamed back to `logs`
+from new_asyncio_module.post_logs_handler import post_logs
+from new_asyncio_module.get_logs_handler import get_logs
+
+
+def main():
+    '''
+    Service starting function.
+    '''
+    app = web.Application()
+
+    app.router.add_post(
+        '/service/{id}/logs',
+        post_logs,
+    )
+
+    app.router.add_get(
+        '/service/{id}/logs/{start}/{end}',
+        get_logs,
+    )
+
+    web.run_app(app)
+
+
+if __name__ == '__main__':
+    main()
