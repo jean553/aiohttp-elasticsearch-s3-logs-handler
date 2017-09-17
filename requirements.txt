@@ -3,6 +3,8 @@ tornado
 boto3
 aiobotocore
 elasticsearch-curator
+asyncio
+aiohttp
 
 # for dev
 pylint
@@ -10,7 +12,3 @@ pylint
 # for tests
 pytest
 requests
-
-# for performance tests
-aiohttp
-asyncio
