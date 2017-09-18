@@ -26,7 +26,11 @@ def main():
         get_logs,
     )
 
-    web.run_app(app)
+    # TODO: #93 the port should be an environment variable
+    web.run_app(
+        app,
+        port=8000,
+    )
 
 
 if __name__ == '__main__':
