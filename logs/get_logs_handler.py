@@ -10,9 +10,9 @@ import requests
 from aiohttp import web
 from elasticsearch import Elasticsearch
 
-from new_asyncio_module.config import ELASTICSEARCH_HOSTNAME
-from new_asyncio_module.config import S3_ENDPOINT
-from new_asyncio_module.config import S3_BUCKET_NAME
+from logs.config import ELASTICSEARCH_HOSTNAME
+from logs.config import S3_ENDPOINT
+from logs.config import S3_BUCKET_NAME
 
 DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
 SNAPSHOT_DAYS_FROM_NOW = 10

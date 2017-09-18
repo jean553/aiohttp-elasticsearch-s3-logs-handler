@@ -6,7 +6,7 @@ from elasticsearch import Elasticsearch, helpers
 
 from aiohttp import web
 
-from new_asyncio_module.config import ELASTICSEARCH_HOSTNAME
+from logs.config import ELASTICSEARCH_HOSTNAME
 
 
 async def post_logs(request: web.Request):

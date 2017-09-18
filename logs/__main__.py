@@ -6,8 +6,8 @@ from aiohttp import web
 
 # TODO: #99 tornado must be replaced by asyncio,
 # after that, the module can be renamed back to `logs`
-from new_asyncio_module.post_logs_handler import post_logs
-from new_asyncio_module.get_logs_handler import get_logs
+from logs.post_logs_handler import post_logs
+from logs.get_logs_handler import get_logs
 
 
 def main():
