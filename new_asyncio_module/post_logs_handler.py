@@ -16,7 +16,7 @@ async def post_logs(request: web.Request):
     data = await request.json()
     logs = data['logs']
 
-    service_id = request.match_info.get('service_id', '1')
+    service_id = request.match_info.get('id')
 
     # TODO: #59 the index name is created using the first log
     # date and time; we should create many indices
