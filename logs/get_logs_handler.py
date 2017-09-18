@@ -1,5 +1,5 @@
 '''
-GET logs handler.
+Handles GET /logs requests.
 '''
 import json
 from datetime import datetime, timedelta
@@ -7,8 +7,10 @@ from typing import Any
 
 import requests
 
-from logs.abstract_handler import AbstractLogsHandler
+from aiohttp import web
+from elasticsearch import Elasticsearch
 
+from logs.config import ELASTICSEARCH_HOSTNAME
 from logs.config import S3_ENDPOINT
 from logs.config import S3_BUCKET_NAME
 
@@ -25,122 +27,117 @@ def get_log_to_string(log: Any) -> str:
     return str(log['_source']).replace("'", '"')
 
 
-# a class is supposed to contain at least more than one public method;
-# we separated the post method from the get in order to keep small files
-# pylint: disable=too-few-public-methods
-#
-# the arguments differ from the initial Tornado method signature
-# (def get(self))
-# pylint: disable=arguments-differ
-class GetLogsHandler(AbstractLogsHandler):
+async def get_logs(request: web.Request):
     '''
-    Get logs handler.
+    Sends back logs according to the given dates range and service.
     '''
+    service_id = request.match_info.get('id')
+    start_date = request.match_info.get('start')
+    end_date = request.match_info.get('end')
 
-    def get(
-        self,
-        service_id: str,
-        start_date: str,
-        end_date: str,
-    ):
-        '''
-        Get /logs action.
-        '''
-        start = datetime.strptime(
-            start_date,
-            DATE_FORMAT,
-        )
+    start = datetime.strptime(
+        start_date,
+        DATE_FORMAT,
+    )
 
-        end = datetime.strptime(
-            end_date,
-            DATE_FORMAT,
-        )
+    end = datetime.strptime(
+        end_date,
+        DATE_FORMAT,
+    )
 
-        result = self.es_client.search(
-            index='data-{}-*'.format(service_id),
-            body={
-                'query': {
-                    'bool': {
-                        'must': {
-                            'match': {
-                                'service_id': service_id
-                            }
-                        },
-                        'filter': {
-                            'range': {
-                                'date': {
-                                    'gte': start,
-                                    'lte': end
-                                }
+    # TODO: #104 the elasticsearch client must be created only once
+    es_client = Elasticsearch(hosts=[ELASTICSEARCH_HOSTNAME],)
+
+    result = es_client.search(
+        index='data-{}-*'.format(service_id),
+        body={
+            'query': {
+                'bool': {
+                    'must': {
+                        'match': {
+                            'service_id': service_id
+                        }
+                    },
+                    'filter': {
+                        'range': {
+                            'date': {
+                                'gte': start,
+                                'lte': end
                             }
                         }
                     }
                 }
             }
-        )
+        }
+    )
 
-        self.write('{"logs": [')
+    stream = web.StreamResponse()
+    stream.content_type = 'application/json'
 
-        logs = result['hits']['hits']
-        elasticsearch_logs_amount = len(logs)
-        last_elasticsearch_log_index = elasticsearch_logs_amount - 1
-        first_iteration = True
+    await stream.prepare(request)
 
-        if elasticsearch_logs_amount > 0:
-            first_iteration = False
+    stream.write(b'{"logs": [')
 
-        for counter, log in enumerate(logs):
-            line = get_log_to_string(log)
+    logs = result['hits']['hits']
+    elasticsearch_logs_amount = len(logs)
+    last_elasticsearch_log_index = elasticsearch_logs_amount - 1
+    first_iteration = True
 
-            if counter != last_elasticsearch_log_index:
-                line += ','
+    if elasticsearch_logs_amount > 0:
+        first_iteration = False
 
-            self.write(line)
-            self.flush()
+    for counter, log in enumerate(logs):
+        line = get_log_to_string(log)
 
-        now = datetime.now()
-        last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
-        if start <= last_snapshot_date:
+        if counter != last_elasticsearch_log_index:
+            line += ','
 
-            s3_index_date = start
+        stream.write(line.encode())
 
-            while s3_index_date <= last_snapshot_date:
+    now = datetime.now()
+    last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
+    if start <= last_snapshot_date:
 
-                s3_index = 'data-%s-%04d-%02d-%02d' % (
-                    service_id,
-                    s3_index_date.year,
-                    s3_index_date.month,
-                    s3_index_date.day,
+        s3_index_date = start
+
+        while s3_index_date <= last_snapshot_date:
+
+            s3_index = 'data-%s-%04d-%02d-%02d' % (
+                service_id,
+                s3_index_date.year,
+                s3_index_date.month,
+                s3_index_date.day,
+            )
+
+            # TODO: #80 this feature must be non-blocking asynchronous
+            # boto3 non-blocking and streaming feature must be used here
+            # and linked to the self.write() feature below
+            response = requests.get(
+                'http://{}/{}/{}'.format(
+                    S3_ENDPOINT,
+                    S3_BUCKET_NAME,
+                    s3_index,
                 )
+            )
 
-                # TODO: #80 this feature must be non-blocking asynchronous
-                # boto3 non-blocking and streaming feature must be used here
-                # and linked to the self.write() feature below
-                response = requests.get(
-                    'http://{}/{}/{}'.format(
-                        S3_ENDPOINT,
-                        S3_BUCKET_NAME,
-                        s3_index,
-                    )
-                )
+            if response.status_code == 200:
 
-                if response.status_code == 200:
+                line = ''
+                if not first_iteration:
+                    line += ','
+                    first_iteration = False
 
-                    line = ''
-                    if not first_iteration:
-                        line += ','
-                        first_iteration = False
+                line += get_log_to_string(json.loads(response.text))
+                stream.write(line.encode())
 
-                    line += get_log_to_string(json.loads(response.text))
-                    self.write(line)
-                    self.flush()
+            s3_index_date += timedelta(days=1)
 
-                s3_index_date += timedelta(days=1)
+    # TODO: #84 logs are only filtered by day,
+    # filters must applied on hours, minutes, seconds
 
-        # TODO: #84 logs are only filtered by day,
-        # filters must applied on hours, minutes, seconds
+    # TODO: #89 replace single quotes by double quotes in order to
+    # return a valid JSON to the client even if the response content-type
+    # is not JSON
+    stream.write(b']}')
 
-        # TODO: #89 replace single quotes by double quotes in order to
-        # return a valid JSON to the client even if the response content-type
-        # is not JSON
-        self.write(']}')
+    return stream

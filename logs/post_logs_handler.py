@@ -1,55 +1,46 @@
 '''
-POST logs handler.
+Handles POST /logs requests.
 '''
 from datetime import datetime
-import json
-from elasticsearch import helpers
+from elasticsearch import Elasticsearch, helpers
 
-from logs.abstract_handler import AbstractLogsHandler
+from aiohttp import web
+
+from logs.config import ELASTICSEARCH_HOSTNAME
 
 
-# a class is supposed to contain at least more than one public method;
-# we separated the post method from the get in order to keep small files
-# pylint: disable=too-few-public-methods
-#
-# the arguments differ from the initial Tornado method signature
-# (def post(self))
-# pylint: disable=arguments-differ
-class PostLogsHandler(AbstractLogsHandler):
+async def post_logs(request: web.Request):
     '''
-    Post logs handler.
+    Save sent logs into ElasticSearch.
     '''
+    data = await request.json()
+    logs = data['logs']
 
-    # the arguments differ from the initial Tornado method signature
-    # (def post(self))
-    # pylint: disable=arguments-differ
-    def post(
-        self,
-        service_id: str,
-    ):
-        '''
-        Post /logs action.
-        '''
-        logs = json.loads(self.request.body.decode('utf-8'))['logs']
+    service_id = request.match_info.get('id')
 
-        # TODO: #59 the index name is created using the first log
-        # date and time; we should create many indices
-        # if logs dates have different days but this should not happen
-        date = datetime.utcfromtimestamp(float(logs[0]['date']))
-        index = date.strftime('data-{}-%Y-%m-%d'.format(service_id))
+    # TODO: #59 the index name is created using the first log
+    # date and time; we should create many indices
+    # if logs dates have different days but this should not happen
+    date = datetime.utcfromtimestamp(float(logs[0]['date']))
+    index = date.strftime('data-{}-%Y-%m-%d'.format(service_id))
 
-        for log in logs:
-            log.update(
-                {
-                    '_type': 'logs',
-                    'service_id': service_id,
-                }
-            )
-            log['_index'] = index
-            log['date'] = datetime.utcfromtimestamp(float(log['date']))
-
-        helpers.bulk(
-            self.es_client,
-            logs,
-            index=index,
+    for log in logs:
+        log.update(
+            {
+                '_type': 'logs',
+                'service_id': service_id,
+            }
         )
+        log['_index'] = index
+        log['date'] = datetime.utcfromtimestamp(float(log['date']))
+
+    # TODO: #104 the elasticsearch client must be created only once
+    es_client = Elasticsearch(hosts=[ELASTICSEARCH_HOSTNAME],)
+
+    helpers.bulk(
+        es_client,
+        logs,
+        index=index,
+    )
+
+    return web.Response()
