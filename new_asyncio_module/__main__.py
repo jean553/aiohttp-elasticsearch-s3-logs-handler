@@ -17,12 +17,12 @@ def main():
     app = web.Application()
 
     app.router.add_post(
-        '/service/{id}/logs',
+        '/api/1/service/{id}/logs',
         post_logs,
     )
 
     app.router.add_get(
-        '/service/{id}/logs/{start}/{end}',
+        '/api/1/service/{id}/logs/{start}/{end}',
         get_logs,
     )
 
