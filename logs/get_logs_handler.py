@@ -10,7 +10,6 @@ import requests
 from aiohttp import web
 from elasticsearch import Elasticsearch
 
-from logs.config import ELASTICSEARCH_HOSTNAME
 from logs.config import S3_ENDPOINT
 from logs.config import S3_BUCKET_NAME
 
@@ -27,7 +26,10 @@ def get_log_to_string(log: Any) -> str:
     return str(log['_source']).replace("'", '"')
 
 
-async def get_logs(request: web.Request):
+async def get_logs(
+    request: web.Request,
+    es_client: Elasticsearch,
+):
     '''
     Sends back logs according to the given dates range and service.
     '''
@@ -44,9 +46,6 @@ async def get_logs(request: web.Request):
         end_date,
         DATE_FORMAT,
     )
-
-    # TODO: #104 the elasticsearch client must be created only once
-    es_client = Elasticsearch(hosts=[ELASTICSEARCH_HOSTNAME],)
 
     result = es_client.search(
         index='data-{}-*'.format(service_id),
