@@ -2,12 +2,14 @@
 Starts the service.
 '''
 
+from functools import partial
 from aiohttp import web
+from elasticsearch import Elasticsearch
 
-# TODO: #99 tornado must be replaced by asyncio,
-# after that, the module can be renamed back to `logs`
 from logs.post_logs_handler import post_logs
 from logs.get_logs_handler import get_logs
+
+from logs.config import ELASTICSEARCH_HOSTNAME
 
 
 def main():
@@ -16,14 +18,22 @@ def main():
     '''
     app = web.Application()
 
+    es_client = Elasticsearch(hosts=[ELASTICSEARCH_HOSTNAME],)
+
     app.router.add_post(
         '/api/1/service/{id}/logs',
-        post_logs,
+        partial(
+            post_logs,
+            es_client=es_client,
+        )
     )
 
     app.router.add_get(
         '/api/1/service/{id}/logs/{start}/{end}',
-        get_logs,
+        partial(
+            get_logs,
+            es_client=es_client,
+        )
     )
 
     # TODO: #93 the port should be an environment variable

@@ -6,10 +6,11 @@ from elasticsearch import Elasticsearch, helpers
 
 from aiohttp import web
 
-from logs.config import ELASTICSEARCH_HOSTNAME
 
-
-async def post_logs(request: web.Request):
+async def post_logs(
+    request: web.Request,
+    es_client: Elasticsearch,
+):
     '''
     Save sent logs into ElasticSearch.
     '''
@@ -33,9 +34,6 @@ async def post_logs(request: web.Request):
         )
         log['_index'] = index
         log['date'] = datetime.utcfromtimestamp(float(log['date']))
-
-    # TODO: #104 the elasticsearch client must be created only once
-    es_client = Elasticsearch(hosts=[ELASTICSEARCH_HOSTNAME],)
 
     helpers.bulk(
         es_client,
