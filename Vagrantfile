@@ -7,17 +7,20 @@ ENV["VAGRANT_DEFAULT_PROVIDER"] = "docker"
 VAGRANTFILE_VERSION = "2"
 S3_BUCKET_NAME = "tornado-kibana-logs-handler"
 S3_ENDPOINT = "s3:5000"
+AIOHTTP_PORT = 8000
 
 Vagrant.configure(VAGRANTFILE_VERSION) do |config|
 
   environment_variables = {
     # used for 'dev' containers to have same permissions as current user
     "HOST_USER_UID" => Process.euid,
+
     "ENV_NAME" => "devdocker",
     "APP_PATH" => "/vagrant",
     "VIRTUAL_ENV_PATH" => "/tmp/virtual_env35",
     "PROJECT" => PROJECT,
     "ELASTICSEARCH_HOSTNAME" => "elasticsearch",
+    "AIOHTTP_PORT" => AIOHTTP_PORT,
 
     # add your credentials here
     "AWS_ACCESS_KEY" => "dummy",
@@ -27,8 +30,6 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     "S3_ENDPOINT" => S3_ENDPOINT
   }
 
-  # TODO: #27 the fake S3 bucket seems to save the files correctly
-  # but throws errors (check README.md file for error details).
   config.vm.define "s3" do |s3|
     s3.vm.provider "docker" do |d|
       d.image = "jean553/docker-s3-server-dev"

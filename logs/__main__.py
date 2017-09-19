@@ -10,6 +10,7 @@ from logs.post_logs_handler import post_logs
 from logs.get_logs_handler import get_logs
 
 from logs.config import ELASTICSEARCH_HOSTNAME
+from logs.config import AIOHTTP_PORT
 
 
 def main():
@@ -36,10 +37,9 @@ def main():
         )
     )
 
-    # TODO: #93 the port should be an environment variable
     web.run_app(
         app,
-        port=8000,
+        port=AIOHTTP_PORT,
     )
 
 
