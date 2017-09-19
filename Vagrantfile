@@ -27,8 +27,6 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     "S3_ENDPOINT" => S3_ENDPOINT
   }
 
-  # TODO: #27 the fake S3 bucket seems to save the files correctly
-  # but throws errors (check README.md file for error details).
   config.vm.define "s3" do |s3|
     s3.vm.provider "docker" do |d|
       d.image = "jean553/docker-s3-server-dev"
