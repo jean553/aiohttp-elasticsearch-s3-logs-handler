@@ -1,0 +1,34 @@
+dist: trusty
+
+services:
+    - docker
+
+
+before_install:
+
+    # initialize the fakse S3 container
+    - docker pull jean553/docker-s3-server-dev
+    - docker run -d -p 127.0.0.1:5000:5000 jean553/docker-s3-server-dev
+
+    # initialize the elasticsearch container
+    - docker pull docker.elastic.co/elasticsearch/elasticsearch:5.4.3
+
+    # initialize the kibana container
+    - docker pull docker.elastic.co/kibana/kibana:5.4.3
+
+
+before_script:
+
+    # prepare the environment
+    - sudo apt-get update
+    - sudo apt-get install python3 libffi-dev python3-pip python3-apt libssl-dev python-apt -y
+    - pip3 install ansible
+    - ansible-playbook build_scripts/bootstrap.yml -vvv
+
+
+script:
+
+    # start the service and execute the tests
+    - python -m "logs" & echo $! > /tmp/service.pid
+    - py.test
+    - kill "$(cat /tmp/service.pid)"
