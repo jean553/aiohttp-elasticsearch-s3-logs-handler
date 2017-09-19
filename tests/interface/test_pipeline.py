@@ -339,15 +339,7 @@ def test_get_different_minute_from_identical_index_from_es():
     first_log_message = 'a first log message'
     first_log_level = 'a low level'
     first_log_category = 'a first category'
-
     first_log_timestamp = 1502304972
-    first_log_datetime = datetime.utcfromtimestamp(first_log_timestamp)
-    first_index = 'data-%s-%04d-%02d-%02d' % (
-        SERVICE_ID,
-        first_log_datetime.year,
-        first_log_datetime.month,
-        first_log_datetime.day,
-    )
 
     first_json = {
         'logs': [
