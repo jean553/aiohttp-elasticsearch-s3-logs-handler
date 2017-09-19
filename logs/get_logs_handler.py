@@ -132,9 +132,6 @@ async def get_logs(
             except botocore.exceptions.ClientError as e:
 
                 # ignore all the actions if the index is not found
-                pass
-
-            if s3_response is None:
                 continue
 
             s3_stream = s3_response['Body']
