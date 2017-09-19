@@ -322,6 +322,7 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     assert response.status_code == 200
     assert len(response.json()['logs']) == 2
 
+
 def test_get_different_minute_from_identical_index_from_es():
     '''
     Posts one log and tries to get it using a range including the log minute,
