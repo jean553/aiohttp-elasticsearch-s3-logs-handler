@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import requests
+import botocore
+import aiobotocore
 
 from aiohttp import web
 from elasticsearch import Elasticsearch
