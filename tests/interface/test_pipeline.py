@@ -321,3 +321,55 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 2
+
+def test_get_different_minute_from_identical_index_from_es():
+    '''
+    Posts one log and tries to get it using a range including the log minute,
+    tries again with a range excluding the log minute
+    '''
+    _empty_s3_bucket()
+
+    es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
+    remove_all_data_indices(es_client)
+    time.sleep(WAIT_TIME)
+
+    # send the first log on August 9, 2017 06:56:12 pm
+
+    first_log_message = 'a first log message'
+    first_log_level = 'a low level'
+    first_log_category = 'a first category'
+
+    first_log_timestamp = 1502304972
+    first_log_datetime = datetime.utcfromtimestamp(first_log_timestamp)
+    first_index = 'data-%s-%04d-%02d-%02d' % (
+        SERVICE_ID,
+        first_log_datetime.year,
+        first_log_datetime.month,
+        first_log_datetime.day,
+    )
+
+    first_json = {
+        'logs': [
+            {
+                'message': first_log_message,
+                'level': first_log_level,
+                'category': first_log_category,
+                'date': str(first_log_timestamp),
+            }
+        ]
+    }
+
+    response = requests.post(
+        BASE_URL + '/logs',
+        json=first_json,
+    )
+    assert response.status_code == 200
+    time.sleep(WAIT_TIME)
+
+    # verifies the log is found if the GET range includes the log minute
+
+    response = requests.get(
+        '%s/logs/2017-08-09-18-56-10/2017-08-09-18-56-15' % (BASE_URL),
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 1
