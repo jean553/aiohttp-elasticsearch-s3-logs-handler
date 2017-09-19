@@ -373,3 +373,17 @@ def test_get_different_minute_from_identical_index_from_es():
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 1
+
+    # verifies the log is not found if the GET range excludes the log minute
+
+    response = requests.get(
+        '%s/logs/2017-08-09-18-56-20/2017-08-09-18-56-25' % (BASE_URL),
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 0
+
+    response = requests.get(
+        '%s/logs/2017-08-09-18-56-05/2017-08-09-18-56-10' % (BASE_URL),
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 0
