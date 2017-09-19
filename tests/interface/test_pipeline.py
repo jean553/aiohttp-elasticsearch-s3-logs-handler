@@ -362,7 +362,7 @@ def test_get_different_minute_from_identical_index_from_es():
     # verifies the log is found if the GET range includes the log minute
 
     response = requests.get(
-        '%s/logs/2017-08-09-18-56-10/2017-08-09-18-56-15' % (BASE_URL),
+        '%s/logs/2017-08-09-18-56-10/2017-08-09-18-56-15' % BASE_URL,
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 1
@@ -370,13 +370,13 @@ def test_get_different_minute_from_identical_index_from_es():
     # verifies the log is not found if the GET range excludes the log minute
 
     response = requests.get(
-        '%s/logs/2017-08-09-18-56-20/2017-08-09-18-56-25' % (BASE_URL),
+        '%s/logs/2017-08-09-18-56-20/2017-08-09-18-56-25' % BASE_URL,
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 0
 
     response = requests.get(
-        '%s/logs/2017-08-09-18-56-05/2017-08-09-18-56-10' % (BASE_URL),
+        '%s/logs/2017-08-09-18-56-05/2017-08-09-18-56-10' % BASE_URL,
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 0
@@ -421,7 +421,7 @@ def test_get_different_hour_from_identical_index_from_es():
     # verifies the log is found if the GET range includes the log hour
 
     response = requests.get(
-        '%s/logs/2017-08-09-17-30-00/2017-08-09-19-30-00' % (BASE_URL),
+        '%s/logs/2017-08-09-17-30-00/2017-08-09-19-30-00' % BASE_URL,
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 1
@@ -429,13 +429,13 @@ def test_get_different_hour_from_identical_index_from_es():
     # verifies the log is not found if the GET range excludes the log hour
 
     response = requests.get(
-        '%s/logs/2017-08-09-16-30-00/2017-08-09-17-30-00' % (BASE_URL),
+        '%s/logs/2017-08-09-16-30-00/2017-08-09-17-30-00' % BASE_URL,
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 0
 
     response = requests.get(
-        '%s/logs/2017-08-09-19-30-00/2017-08-09-20-30-00' % (BASE_URL),
+        '%s/logs/2017-08-09-19-30-00/2017-08-09-20-30-00' % BASE_URL,
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 0
