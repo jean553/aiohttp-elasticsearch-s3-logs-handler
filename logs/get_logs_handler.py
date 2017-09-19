@@ -119,28 +119,41 @@ async def get_logs(
                 s3_index_date.day,
             )
 
-            # TODO: #80 this feature must be non-blocking asynchronous
-            # boto3 non-blocking and streaming feature must be used here
-            # and linked to the self.write() feature below
-            response = requests.get(
-                'http://{}/{}/{}'.format(
-                    S3_ENDPOINT,
-                    S3_BUCKET_NAME,
-                    s3_index,
+            s3_index_date += timedelta(days=1)
+
+            s3_response = None
+
+            try:
+                s3_response = await s3_client.get_object(
+                    Bucket=S3_BUCKET_NAME,
+                    Key=s3_index,
                 )
-            )
 
-            if response.status_code == 200:
+            except botocore.exceptions.ClientError as e:
 
-                line = ''
+                # ignore all the actions if the index is not found
+                pass
+
+            if s3_response is None:
+                continue
+
+            s3_stream = s3_response['Body']
+            s3_line = await s3_stream.readline()
+
+            while(len(s3_line) > 0):
+
+                temp_line = s3_line.decode('utf-8')
+                line = get_log_to_string(json.loads(temp_line))
+
                 if not first_iteration:
-                    line += ','
-                    first_iteration = False
+                    line = ',' + line
+                first_iteration = False
 
-                line += get_log_to_string(json.loads(response.text))
                 stream.write(line.encode())
 
-            s3_index_date += timedelta(days=1)
+                s3_line = await s3_stream.readline()
+
+            s3_stream.close()
 
     # TODO: #84 logs are only filtered by day,
     # filters must applied on hours, minutes, seconds
