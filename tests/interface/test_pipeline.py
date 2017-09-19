@@ -323,10 +323,10 @@ def test_two_posts_at_different_times_should_only_update_one_to_s3():
     assert len(response.json()['logs']) == 2
 
 
-def test_get_different_minute_from_identical_index_from_es():
+def test_get_different_second_from_identical_index_from_es():
     '''
-    Posts one log and tries to get it using a range including the log minute,
-    tries again with a range excluding the log minute
+    Posts one log and tries to get it using a range including the log second,
+    tries again with a range excluding the log second
     '''
     _empty_s3_bucket()
 
@@ -359,7 +359,7 @@ def test_get_different_minute_from_identical_index_from_es():
     assert response.status_code == 200
     time.sleep(WAIT_TIME)
 
-    # verifies the log is found if the GET range includes the log minute
+    # verifies the log is found if the GET range includes the log second
 
     response = requests.get(
         '%s/logs/2017-08-09-18-56-10/2017-08-09-18-56-15' % BASE_URL,
@@ -367,7 +367,7 @@ def test_get_different_minute_from_identical_index_from_es():
     assert response.status_code == 200
     assert len(response.json()['logs']) == 1
 
-    # verifies the log is not found if the GET range excludes the log minute
+    # verifies the log is not found if the GET range excludes the log second
 
     response = requests.get(
         '%s/logs/2017-08-09-18-56-20/2017-08-09-18-56-25' % BASE_URL,
