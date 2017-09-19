@@ -128,10 +128,7 @@ async def get_logs(
                     Bucket=S3_BUCKET_NAME,
                     Key=s3_index,
                 )
-
-            except botocore.exceptions.ClientError as e:
-
-                # ignore all the actions if the index is not found
+            except botocore.exceptions.ClientError:
                 continue
 
             s3_stream = s3_response['Body']
