@@ -101,6 +101,15 @@ async def get_logs(
 
         s3_index_date = start
 
+        s3_session = aiobotocore.get_session()
+        s3_client = s3_session.create_client(
+            service_name='s3',
+            region_name='',
+            aws_secret_access_key='',
+            aws_access_key_id='',
+            endpoint_url='http://' + S3_ENDPOINT,
+        )
+
         while s3_index_date <= last_snapshot_date:
 
             s3_index = 'data-%s-%04d-%02d-%02d' % (
