@@ -163,4 +163,6 @@ async def get_logs(
     # is not JSON
     stream.write(b']}')
 
+    s3_client.close()
+
     return stream
