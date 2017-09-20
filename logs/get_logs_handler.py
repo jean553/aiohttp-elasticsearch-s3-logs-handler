@@ -158,9 +158,6 @@ async def get_logs(
 
             s3_stream.close()
 
-    # TODO: #84 logs are only filtered by day,
-    # filters must applied on hours, minutes, seconds
-
     # TODO: #89 replace single quotes by double quotes in order to
     # return a valid JSON to the client even if the response content-type
     # is not JSON
