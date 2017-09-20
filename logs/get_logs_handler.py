@@ -136,7 +136,17 @@ async def get_logs(
             while(len(s3_line) > 0):
 
                 temp_line = s3_line.decode('utf-8')
-                line = get_log_to_string(json.loads(temp_line))
+                line_items = json.loads(temp_line)
+                log_date = datetime.strptime(
+                    line_items['_source']['date'],
+                    '%Y-%m-%dT%H:%M:%S',
+                )
+
+                if log_date < start or log_date > end:
+                    s3_line = await s3_stream.readline()
+                    continue
+
+                line = get_log_to_string(line_items)
 
                 if not first_iteration:
                     line = ',' + line
