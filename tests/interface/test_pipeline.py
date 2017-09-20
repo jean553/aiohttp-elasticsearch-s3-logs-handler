@@ -498,3 +498,66 @@ def test_get_different_day_from_identical_index_from_es():
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 0
+
+
+def test_get_different_second_from_identical_index_from_s3():
+    '''
+    Posts one log and tries to get it using a range including the log second,
+    tries again with a range excluding the log second;
+    the log has been uploaded to S3
+    '''
+    _empty_s3_bucket()
+
+    es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
+    remove_all_data_indices(es_client)
+    time.sleep(WAIT_TIME)
+
+    # send the first log on August 9, 2017 06:56:12 pm
+
+    first_log_message = 'a first log message'
+    first_log_level = 'a low level'
+    first_log_category = 'a first category'
+    first_log_timestamp = 1502304972
+
+    first_json = {
+        'logs': [
+            {
+                'message': first_log_message,
+                'level': first_log_level,
+                'category': first_log_category,
+                'date': str(first_log_timestamp),
+            }
+        ]
+    }
+
+    response = requests.post(
+        BASE_URL + '/logs',
+        json=first_json,
+    )
+    assert response.status_code == 200
+    time.sleep(WAIT_TIME)
+
+    _execute_snapshot_script()
+    time.sleep(WAIT_TIME)
+
+    # verifies the log is found if the GET range includes the log second
+
+    response = requests.get(
+        '%s/logs/2017-08-09-18-56-10/2017-08-09-18-56-20' % BASE_URL,
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 1
+
+    # verifies the log is not found if the GET range excludes the log second
+
+    response = requests.get(
+        '%s/logs/2017-08-09-18-56-05/2017-08-09-18-56-10' % BASE_URL,
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 0
+
+    response = requests.get(
+        '%s/logs/2017-08-09-18-56-20/2017-08-09-18-56-25' % BASE_URL,
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 0
