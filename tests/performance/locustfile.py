@@ -3,8 +3,6 @@ Locust file for loading tests purposes.
 '''
 from locust import HttpLocust, TaskSet, task
 
-RANGE_INTERVAL = 3600
-
 
 class WebsiteTasks(TaskSet):
     '''
