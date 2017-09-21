@@ -37,6 +37,16 @@ python -m "logs"
 py.test
 ```
 
+## Loading tests
+
+```bash
+locust --host=http://localhost:8000
+```
+
+Connect to the web interface on port 8089.
+
+This is better to run the Locust client on a separated machine.
+
 ## Pylint
 
 ```bash
