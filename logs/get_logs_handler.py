@@ -50,6 +50,9 @@ async def get_logs(
 
     result = es_client.search(
         index='data-{}-*'.format(service_id),
+        size=10,
+        scroll='2m',
+        search_type='query_then_fetch',
         body={
             'query': {
                 'bool': {
