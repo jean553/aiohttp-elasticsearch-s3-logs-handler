@@ -101,6 +101,7 @@ async def get_logs(
 
             line = ''
 
+        # TODO: #119 Elasticsearch streaming should be non-blocking IO
         result = es_client.scroll(
             scroll_id=scroll_id,
             scroll='2m',
