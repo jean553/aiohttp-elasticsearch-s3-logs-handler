@@ -152,3 +152,33 @@ def test_get_high_logs_amount_from_es():
         logs,
         index='data-1-2017-08-09',
     )
+
+    # August 15th, 10:00:00 am
+    start_timestamp = 1502791200
+
+    # August 15th, 11:40:00 am
+    end_timestamp = 1502797200
+
+    logs = []
+    for timestamp in range(start_timestamp, end_timestamp):
+        logs.append({
+            '_type': 'logs',
+            'service_id': '1',
+            'message': 'message {}'.format(timestamp),
+            'level': 'level {}'.format(timestamp),
+            'category': 'category {}'.format(timestamp),
+            'date': datetime.utcfromtimestamp(float(timestamp)),
+        })
+
+    # insert 6000 logs into one index
+    helpers.bulk(
+        es_client,
+        logs,
+        index='data-1-2017-08-15',
+    )
+
+    response = requests.get(
+        BASE_URL + '/logs/2017-08-05-10-00-00/2017-08-20-10-00-00',
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 12000
