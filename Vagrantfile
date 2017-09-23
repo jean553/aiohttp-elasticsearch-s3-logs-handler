@@ -1,11 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby ts=2 sw=2 expandtab :
 
-PROJECT = "tornado-kibana-logs-handler"
+PROJECT = "aiohttp-elasticsearch-s3-logs-handler"
 ENV["VAGRANT_NO_PARALLEL"] = "yes"
 ENV["VAGRANT_DEFAULT_PROVIDER"] = "docker"
 VAGRANTFILE_VERSION = "2"
-S3_BUCKET_NAME = "tornado-kibana-logs-handler"
+S3_BUCKET_NAME = "aiohttp-elasticsearch-s3-logs-handler"
 S3_ENDPOINT = "s3:5000"
 AIOHTTP_PORT = 8000
 

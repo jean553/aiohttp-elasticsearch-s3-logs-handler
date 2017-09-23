@@ -17,7 +17,7 @@ resource "aws_instance" "elk" {
   subnet_id           = "${aws_subnet.vpc_subnet.id}"
 
   tags {
-    Name              = "tornado-kibana-logs-handler_elk"
+    Name              = "aiohttp-elasticsearch-s3-logs-handler_elk"
   }
 }
 
@@ -29,12 +29,12 @@ resource "aws_instance" "backend" {
   subnet_id           = "${aws_subnet.vpc_subnet.id}"
 
   tags {
-    Name              = "tornado-kibana-logs-handler_backend"
+    Name              = "aiohttp-elasticsearch-s3-logs-handler_backend"
   }
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket              = "tornado-kibana-logs-handler"
+  bucket              = "aiohttp-elasticsearch-s3-logs-handler"
   acl                 = "private"
 }
 
@@ -43,7 +43,7 @@ resource "aws_vpc" "vpc" {
   cidr_block          = "10.0.0.0/28"
 
   tags {
-    Name              = "tornado-kibana-logs-handler_vpc"
+    Name              = "aiohttp-elasticsearch-s3-logs-handler_vpc"
   }
 }
 
@@ -53,7 +53,7 @@ resource "aws_subnet" "vpc_subnet" {
   cidr_block          = "10.0.0.0/28"
 
   tags {
-    Name              = "tornado-kibana-logs-handler_vpc_subnet"
+    Name              = "aiohttp-elasticsearch-s3-logs-handler_vpc_subnet"
   }
 }
 
@@ -62,12 +62,12 @@ resource "aws_internet_gateway" "vpc_gateway" {
   vpc_id              = "${aws_vpc.vpc.id}"
 
   tags {
-    Name              = "tornado-kibana-logs-handler_vpc_gateway"
+    Name              = "aiohttp-elasticsearch-s3-logs-handler_vpc_gateway"
   }
 }
 
 resource "aws_default_route_table" "vpc_default_route_table" {
-  
+
   default_route_table_id = "${aws_vpc.vpc.default_route_table_id}"
 
   route {
@@ -76,7 +76,7 @@ resource "aws_default_route_table" "vpc_default_route_table" {
   }
 
   tags {
-    Name              = "tornado-kibana-logs-handler_vpc_default_route_table"
+    Name              = "aiohttp-elasticsearch-s3-logs-handler_vpc_default_route_table"
   }
 }
 

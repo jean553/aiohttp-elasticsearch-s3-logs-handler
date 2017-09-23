@@ -31,13 +31,13 @@
 
     - name: project directory created
       file:
-        path: /opt/applications/tornado-kibana-logs-handler
+        path: /opt/applications/aiohttp-elasticsearch-s3-logs-handler
         state: directory
 
-    - name: tornado-kibana-logs-handler project cloned
+    - name: aiohttp-elasticsearch-s3-logs-handler project cloned
       git:
-        repo: https://github.com/jean553/tornado-kibana-logs-handler.git
-        dest: /opt/applications/tornado-kibana-logs-handler
+        repo: https://github.com/jean553/aiohttp-elasticsearch-s3-logs-handler.git
+        dest: /opt/applications/aiohttp-elasticsearch-s3-logs-handler
 
     - name: pip packages installed using tox
       pip:
@@ -48,7 +48,7 @@
       shell: >
         tox -r -e aws
       args:
-        chdir: "/opt/applications/tornado-kibana-logs-handler"
+        chdir: "/opt/applications/aiohttp-elasticsearch-s3-logs-handler"
         creates: "/opt/virtual_env35"
 
     - name: elasticdump installed using npm
