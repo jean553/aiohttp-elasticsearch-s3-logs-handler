@@ -50,6 +50,9 @@ async def get_logs(
 
     result = es_client.search(
         index='data-{}-*'.format(service_id),
+        size=10,
+        scroll='2m',
+        search_type='query_then_fetch',
         body={
             'query': {
                 'bool': {
@@ -73,26 +76,39 @@ async def get_logs(
 
     stream = web.StreamResponse()
     stream.content_type = 'application/json'
-
     await stream.prepare(request)
-
     stream.write(b'{"logs": [')
 
+    scroll_id = result['_scroll_id']
     logs = result['hits']['hits']
     elasticsearch_logs_amount = len(logs)
-    last_elasticsearch_log_index = elasticsearch_logs_amount - 1
-    first_iteration = True
 
-    if elasticsearch_logs_amount > 0:
-        first_iteration = False
+    first_iteration = False if elasticsearch_logs_amount > 0 else True
 
-    for counter, log in enumerate(logs):
-        line = get_log_to_string(log)
+    line = ''
+    while elasticsearch_logs_amount > 0:
 
-        if counter != last_elasticsearch_log_index:
-            line += ','
+        for counter, log in enumerate(logs):
+            line += get_log_to_string(log)
 
-        stream.write(line.encode())
+            if counter != elasticsearch_logs_amount - 1:
+                line += ','
+
+            stream.write(line.encode())
+
+            line = ''
+
+        # TODO: #119 Elasticsearch streaming should be non-blocking IO
+        result = es_client.scroll(
+            scroll_id=scroll_id,
+            scroll='2m',
+        )
+        scroll_id = result['_scroll_id']
+        logs = result['hits']['hits']
+        elasticsearch_logs_amount = len(logs)
+
+        if elasticsearch_logs_amount > 0:
+            line = ','
 
     now = datetime.now()
     last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)

@@ -7,7 +7,7 @@ from datetime import datetime
 
 import requests
 
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 
 from elasticsearch_client import remove_all_data_indices
 
