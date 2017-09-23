@@ -76,11 +76,10 @@ async def get_logs(
 
     stream = web.StreamResponse()
     stream.content_type = 'application/json'
-
     await stream.prepare(request)
-
     stream.write(b'{"logs": [')
 
+    scroll_id = result['_scroll_id']
     logs = result['hits']['hits']
     elasticsearch_logs_amount = len(logs)
     last_elasticsearch_log_index = elasticsearch_logs_amount - 1
@@ -89,13 +88,31 @@ async def get_logs(
     if elasticsearch_logs_amount > 0:
         first_iteration = False
 
-    for counter, log in enumerate(logs):
-        line = get_log_to_string(log)
+    line = ''
+    while elasticsearch_logs_amount > 0:
 
-        if counter != last_elasticsearch_log_index:
-            line += ','
+        for counter, log in enumerate(logs):
+            line += get_log_to_string(log)
 
-        stream.write(line.encode())
+            if counter != last_elasticsearch_log_index:
+                line += ','
+
+            stream.write(line.encode())
+
+            line = ''
+
+        result = es_client.scroll(
+            scroll_id=scroll_id,
+            scroll='2m',
+        )
+        scroll_id = result['_scroll_id']
+        logs = result['hits']['hits']
+        elasticsearch_logs_amount = len(logs)
+
+        if elasticsearch_logs_amount > 0:
+            line = ','
+
+        last_elasticsearch_log_index = elasticsearch_logs_amount - 1
 
     now = datetime.now()
     last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
