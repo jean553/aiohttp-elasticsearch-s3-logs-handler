@@ -82,10 +82,8 @@ async def get_logs(
     scroll_id = result['_scroll_id']
     logs = result['hits']['hits']
     elasticsearch_logs_amount = len(logs)
-    first_iteration = True
 
-    if elasticsearch_logs_amount > 0:
-        first_iteration = False
+    first_iteration = False if elasticsearch_logs_amount > 0 else True
 
     line = ''
     while elasticsearch_logs_amount > 0:
