@@ -82,7 +82,6 @@ async def get_logs(
     scroll_id = result['_scroll_id']
     logs = result['hits']['hits']
     elasticsearch_logs_amount = len(logs)
-    last_elasticsearch_log_index = elasticsearch_logs_amount - 1
     first_iteration = True
 
     if elasticsearch_logs_amount > 0:
@@ -94,7 +93,7 @@ async def get_logs(
         for counter, log in enumerate(logs):
             line += get_log_to_string(log)
 
-            if counter != last_elasticsearch_log_index:
+            if counter != elasticsearch_logs_amount - 1:
                 line += ','
 
             stream.write(line.encode())
@@ -112,8 +111,6 @@ async def get_logs(
 
         if elasticsearch_logs_amount > 0:
             line = ','
-
-        last_elasticsearch_log_index = elasticsearch_logs_amount - 1
 
     now = datetime.now()
     last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
