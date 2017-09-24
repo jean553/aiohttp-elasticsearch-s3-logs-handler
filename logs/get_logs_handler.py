@@ -22,6 +22,7 @@ API_DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
 ELASTICSEARCH_DATE_FORMAT = 'yyyy-MM-dd-HH-mm-ss'
 SNAPSHOT_DAYS_FROM_NOW = 10
 ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS = 10
+ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME = '1m'  # 1 minute
 
 
 def get_log_to_string(log: Any) -> str:
@@ -57,10 +58,11 @@ async def get_logs(
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
             async with session.get(
-                'http://{}:{}/data-{}-*/_search?scroll=2m'.format(
+                'http://{}:{}/data-{}-*/_search?scroll={}'.format(
                     ELASTICSEARCH_HOSTNAME,
                     ELASTICSEARCH_PORT,
                     service_id,
+                    ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME,
                 ),
                 json={
                     'size': 10,
@@ -120,7 +122,7 @@ async def get_logs(
                         service_id,
                     ),
                     json={
-                        'scroll': '2m',
+                        'scroll': ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME,
                         'scroll_id': scroll_id
                     }
                 ) as response:
