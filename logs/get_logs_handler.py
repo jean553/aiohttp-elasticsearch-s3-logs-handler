@@ -19,6 +19,7 @@ from logs.config import ELASTICSEARCH_HOSTNAME
 from logs.config import ELASTICSEARCH_PORT
 
 API_DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
+ELASTICSEARCH_DATE_FORMAT = 'yyyy-MM-dd-HH-mm-ss'
 SNAPSHOT_DAYS_FROM_NOW = 10
 ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS = 10
 
@@ -53,16 +54,6 @@ async def get_logs(
         API_DATE_FORMAT,
     )
 
-    start_string = datetime.strftime(
-        start,
-        '%Y-%m-%dT%H:%M:%S',
-    )
-
-    end_string = datetime.strftime(
-        end,
-        '%Y-%m-%dT%H:%M:%S',
-    )
-
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
             async with session.get(
@@ -83,8 +74,9 @@ async def get_logs(
                             'filter': {
                                 'range': {
                                     'date': {
-                                        'gte': start_string,
-                                        'lte': end_string
+                                        'gte': start_date,
+                                        'lte': end_date,
+                                        'format': ELASTICSEARCH_DATE_FORMAT
                                     }
                                 }
                             }
