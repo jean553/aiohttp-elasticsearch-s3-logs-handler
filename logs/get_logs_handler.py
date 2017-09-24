@@ -18,7 +18,7 @@ from logs.config import S3_BUCKET_NAME
 from logs.config import ELASTICSEARCH_HOSTNAME
 from logs.config import ELASTICSEARCH_PORT
 
-DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
+API_DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
 SNAPSHOT_DAYS_FROM_NOW = 10
 ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS = 10
 
@@ -45,12 +45,12 @@ async def get_logs(
 
     start = datetime.strptime(
         start_date,
-        DATE_FORMAT,
+        API_DATE_FORMAT,
     )
 
     end = datetime.strptime(
         end_date,
-        DATE_FORMAT,
+        API_DATE_FORMAT,
     )
 
     start_string = datetime.strftime(
