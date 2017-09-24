@@ -22,6 +22,7 @@ API_DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
 ELASTICSEARCH_DATE_FORMAT = 'yyyy-MM-dd-HH-mm-ss'
 SNAPSHOT_DAYS_FROM_NOW = 10
 ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS = 10
+ELASTICSEARCH_MAXIMUM_RESULTS_PER_PAGE = 10
 ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME = '1m'  # 1 minute
 
 
@@ -52,7 +53,7 @@ async def _get_logs_from_elasticsearch(
                     ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME,
                 ),
                 json={
-                    'size': 10,
+                    'size': ELASTICSEARCH_MAXIMUM_RESULTS_PER_PAGE,
                     'query': {
                         'bool': {
                             'must': {
