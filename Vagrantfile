@@ -20,6 +20,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     "VIRTUAL_ENV_PATH" => "/tmp/virtual_env35",
     "PROJECT" => PROJECT,
     "ELASTICSEARCH_HOSTNAME" => "elasticsearch",
+    "ELASTICSEARCH_PORT" => 9200,
     "AIOHTTP_PORT" => AIOHTTP_PORT,
 
     # add your credentials here
