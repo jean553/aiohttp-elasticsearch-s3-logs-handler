@@ -25,7 +25,7 @@ ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS = 10
 ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME = '1m'  # 1 minute
 
 
-def get_log_to_string(log: Any) -> str:
+def _get_log_to_string(log: Any) -> str:
     '''
     Returns a string representation of the given log.
     Convert single quotes to double quotes in order to match with JSON format
@@ -34,11 +34,11 @@ def get_log_to_string(log: Any) -> str:
     return str(log['_source']).replace("'", '"')
 
 
-async def get_logs_from_elasticsearch(
+async def _get_logs_from_elasticsearch(
     service_id: int,
     start_date: str,
     end_date: str,
-):
+) -> dict:
     '''
     Coroutine that returns the first page of logs from ES.
     '''
@@ -97,7 +97,7 @@ async def get_logs(
         API_DATE_FORMAT,
     )
 
-    result = await get_logs_from_elasticsearch(
+    result = await _get_logs_from_elasticsearch(
         service_id,
         start_date,
         end_date,
@@ -118,7 +118,7 @@ async def get_logs(
     while elasticsearch_logs_amount > 0:
 
         for counter, log in enumerate(logs):
-            line += get_log_to_string(log)
+            line += _get_log_to_string(log)
 
             if counter != elasticsearch_logs_amount - 1:
                 line += ','
@@ -205,7 +205,7 @@ async def get_logs(
                     s3_line = await s3_stream.readline()
                     continue
 
-                line = get_log_to_string(line_items)
+                line = _get_log_to_string(line_items)
 
                 if not first_iteration:
                     line = ',' + line
