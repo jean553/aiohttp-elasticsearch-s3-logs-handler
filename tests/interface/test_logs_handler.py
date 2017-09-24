@@ -119,3 +119,97 @@ def test_get_logs():
     assert log['level'] == log_level
     assert log['category'] == log_category
     assert log['date'] == log_date
+
+
+def test_post_two_logs_at_two_different_days():
+    '''
+    Post two logs at two different days in order
+    to check if multiple indices are created.
+    '''
+    es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
+    remove_all_data_indices(es_client)
+    time.sleep(WAIT_TIME)
+
+    # May 10, 2017 23:55:00
+    first_log_timestamp = 1494460500
+    second_log_timestamp = 1494461100
+
+    json = {
+        'logs': [
+            {
+                'message': 'a first log message',
+                'level': 'a low level',
+                'category': 'a first category',
+                'date': str(first_log_timestamp),
+            },
+            {
+                'message': 'a second log message',
+                'level': 'a low level',
+                'category': 'a second category',
+                'date': str(second_log_timestamp),
+            }
+        ]
+    }
+
+    response = requests.post(
+        BASE_URL + '/logs',
+        json=json,
+    )
+    assert response.status_code == 200
+    time.sleep(WAIT_TIME)
+
+    # check that the first index has been created
+
+    first_date = datetime.utcfromtimestamp(first_log_timestamp)
+    first_index = 'data-1-%04d-%02d-%02d' % (
+        first_date.year,
+        first_date.month,
+        first_date.day,
+    )
+
+    result = es_client.search(
+        index=first_index,
+        body={
+            'query': {
+                'bool': {
+                    'must': {
+                        'match': {
+                            'service_id': '1'
+                        },
+                    },
+                }
+            }
+        }
+    )
+
+    logs_amount = result['hits']['total']
+    assert logs_amount == 1, \
+        'unexpected logs amount, got %s, expected 1' % logs_amount
+
+    # check that the second index has been created
+
+    second_date = datetime.utcfromtimestamp(second_log_timestamp)
+    second_index = 'data-1-%04d-%02d-%02d' % (
+        second_date.year,
+        second_date.month,
+        second_date.day,
+    )
+
+    result = es_client.search(
+        index=second_index,
+        body={
+            'query': {
+                'bool': {
+                    'must': {
+                        'match': {
+                            'service_id': '1'
+                        },
+                    },
+                }
+            }
+        }
+    )
+
+    logs_amount = result['hits']['total']
+    assert logs_amount == 1, \
+        'unexpected logs amount, got %s, expected 1' % logs_amount

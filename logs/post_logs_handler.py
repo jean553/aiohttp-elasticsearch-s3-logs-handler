@@ -19,13 +19,14 @@ async def post_logs(
 
     service_id = request.match_info.get('id')
 
-    # TODO: #59 the index name is created using the first log
-    # date and time; we should create many indices
-    # if logs dates have different days but this should not happen
-    date = datetime.utcfromtimestamp(float(logs[0]['date']))
-    index = date.strftime('data-{}-%Y-%m-%d'.format(service_id))
-
     for log in logs:
+
+        # TODO: #125 almost everytime, indices have the same day,
+        # so this is superfluous to generate the index for each log;
+        # we should find a better way to handle indices creations
+        log_date = datetime.utcfromtimestamp(float(log['date']))
+        index = log_date.strftime('data-{}-%Y-%m-%d'.format(service_id))
+
         log.update(
             {
                 '_type': 'logs',
@@ -33,7 +34,7 @@ async def post_logs(
             }
         )
         log['_index'] = index
-        log['date'] = datetime.utcfromtimestamp(float(log['date']))
+        log['date'] = log_date
 
     helpers.bulk(
         es_client,
