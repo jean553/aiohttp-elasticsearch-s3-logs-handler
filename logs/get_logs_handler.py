@@ -76,6 +76,33 @@ async def _get_logs_from_elasticsearch(
                 return await response.json()
 
 
+async def _scroll_logs_from_elasticsearch(
+    service_id: int,
+    scroll_id: str,
+) -> dict:
+    '''
+    Scroll the next page of found results from Elasticsearch.
+    '''
+    # TODO: #123 we use a new session for one request here;
+    # if we try to use the same session as before,
+    # then not all the logs are returned from ES;
+    # we have to investigate how to organize the session(s) here
+    async with aiohttp.ClientSession() as session:
+        with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
+            async with session.get(
+                'http://{}:{}/_search/scroll'.format(
+                    ELASTICSEARCH_HOSTNAME,
+                    ELASTICSEARCH_PORT,
+                    service_id,
+                ),
+                json={
+                    'scroll': ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME,
+                    'scroll_id': scroll_id
+                }
+            ) as response:
+                return await response.json()
+
+
 async def get_logs(
     request: web.Request,
     es_client: Elasticsearch,
@@ -127,24 +154,10 @@ async def get_logs(
 
             line = ''
 
-        # TODO: #123 we use a new session for one request here;
-        # if we try to use the same session as before,
-        # then not all the logs are returned from ES;
-        # we have to investigate how to organize the session(s) here
-        async with aiohttp.ClientSession() as session:
-            with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
-                async with session.get(
-                    'http://{}:{}/_search/scroll'.format(
-                        ELASTICSEARCH_HOSTNAME,
-                        ELASTICSEARCH_PORT,
-                        service_id,
-                    ),
-                    json={
-                        'scroll': ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME,
-                        'scroll_id': scroll_id
-                    }
-                ) as response:
-                    result = await response.json()
+        result = await _scroll_logs_from_elasticsearch(
+            service_id,
+            scroll_id,
+        )
 
         scroll_id = result['_scroll_id']
         logs = result['hits']['hits']
