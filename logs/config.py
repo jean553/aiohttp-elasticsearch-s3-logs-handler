@@ -7,6 +7,9 @@ import os
 ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
 assert ELASTICSEARCH_HOSTNAME is not None
 
+ELASTICSEARCH_PORT = os.getenv('ELASTICSEARCH_PORT')
+assert ELASTICSEARCH_PORT is not None
+
 AIOHTTP_PORT = int(os.getenv('AIOHTTP_PORT'))
 assert AIOHTTP_PORT is not None
 
