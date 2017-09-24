@@ -110,11 +110,22 @@ async def get_logs(
 
             line = ''
 
-        # TODO: #119 Elasticsearch streaming should be non-blocking IO
-        result = es_client.scroll(
-            scroll_id=scroll_id,
-            scroll='2m',
-        )
+        # TODO: I guess only one session should be used...
+        async with aiohttp.ClientSession() as session:
+            with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
+                async with session.get(
+                    'http://{}:{}/_search/scroll'.format(
+                        ELASTICSEARCH_HOSTNAME,
+                        ELASTICSEARCH_PORT,
+                        service_id,
+                    ),
+                    json={
+                        'scroll': '2m',
+                        'scroll_id': scroll_id
+                    }
+                ) as response:
+                    result = await response.json()
+
         scroll_id = result['_scroll_id']
         logs = result['hits']['hits']
         elasticsearch_logs_amount = len(logs)
