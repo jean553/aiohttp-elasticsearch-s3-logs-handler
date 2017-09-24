@@ -2,20 +2,25 @@
 Handles GET /logs requests.
 '''
 import json
+import async_timeout
 from datetime import datetime, timedelta
 from typing import Any
 
 import botocore
 import aiobotocore
 
+import aiohttp
 from aiohttp import web
 from elasticsearch import Elasticsearch
 
 from logs.config import S3_ENDPOINT
 from logs.config import S3_BUCKET_NAME
+from logs.config import ELASTICSEARCH_HOSTNAME
+from logs.config import ELASTICSEARCH_PORT
 
 DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
 SNAPSHOT_DAYS_FROM_NOW = 10
+ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS = 10
 
 
 def get_log_to_string(log: Any) -> str:
@@ -73,6 +78,16 @@ async def get_logs(
             }
         }
     )
+
+    async with aiohttp.ClientSession() as session:
+        with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
+            async with session.get(
+                'http://{}:{}'.format(
+                    ELASTICSEARCH_HOSTNAME,
+                    ELASTICSEARCH_PORT,
+                )
+            ) as response:
+                results = await response.text()
 
     stream = web.StreamResponse()
     stream.content_type = 'application/json'
