@@ -112,7 +112,10 @@ async def get_logs(
 
             line = ''
 
-        # TODO: I guess only one session should be used...
+        # TODO: #123 we use a new session for one request here;
+        # if we try to use the same session as before,
+        # then not all the logs are returned from ES;
+        # we have to investigate how to organize the session(s) here
         async with aiohttp.ClientSession() as session:
             with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
                 async with session.get(
