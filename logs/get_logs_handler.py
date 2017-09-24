@@ -104,6 +104,24 @@ async def _scroll_logs_from_elasticsearch(
                 return await response.json()
 
 
+def _stream_logs_chunk(
+    stream: aiohttp.web_response.StreamResponse,
+    logs: list,
+):
+    '''
+    Streams each log one by one to the client.
+    '''
+    last_log_index = len(logs) - 1
+
+    for counter, log in enumerate(logs):
+        line = _get_log_to_string(log)
+
+        if counter != last_log_index:
+            line += ','
+
+        stream.write(line.encode())
+
+
 async def get_logs(
     request: web.Request,
     es_client: Elasticsearch,
@@ -141,19 +159,17 @@ async def get_logs(
     elasticsearch_logs_amount = len(logs)
 
     first_iteration = False if elasticsearch_logs_amount > 0 else True
+    first_elasticsearch_scroll = True
 
-    line = ''
     while elasticsearch_logs_amount > 0:
 
-        for counter, log in enumerate(logs):
-            line += _get_log_to_string(log)
+        if not first_elasticsearch_scroll:
+            stream.write(b',')
 
-            if counter != elasticsearch_logs_amount - 1:
-                line += ','
-
-            stream.write(line.encode())
-
-            line = ''
+        _stream_logs_chunk(
+            stream,
+            logs,
+        )
 
         result = await _scroll_logs_from_elasticsearch(
             service_id,
@@ -164,8 +180,7 @@ async def get_logs(
         logs = result['hits']['hits']
         elasticsearch_logs_amount = len(logs)
 
-        if elasticsearch_logs_amount > 0:
-            line = ','
+        first_elasticsearch_scroll = False
 
     now = datetime.now()
     last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
