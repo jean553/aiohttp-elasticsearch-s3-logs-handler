@@ -53,41 +53,46 @@ async def get_logs(
         DATE_FORMAT,
     )
 
-    result = es_client.search(
-        index='data-{}-*'.format(service_id),
-        size=10,
-        scroll='2m',
-        search_type='query_then_fetch',
-        body={
-            'query': {
-                'bool': {
-                    'must': {
-                        'match': {
-                            'service_id': service_id
-                        }
-                    },
-                    'filter': {
-                        'range': {
-                            'date': {
-                                'gte': start,
-                                'lte': end
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    start_string = datetime.strftime(
+        start,
+        '%Y-%m-%dT%H:%M:%S',
+    )
+
+    end_string = datetime.strftime(
+        end,
+        '%Y-%m-%dT%H:%M:%S',
     )
 
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
             async with session.get(
-                'http://{}:{}'.format(
+                'http://{}:{}/data-{}-*/_search?scroll=2m'.format(
                     ELASTICSEARCH_HOSTNAME,
                     ELASTICSEARCH_PORT,
-                )
+                    service_id,
+                ),
+                json={
+                    'size': 10,
+                    'query': {
+                        'bool': {
+                            'must': {
+                                'match': {
+                                    'service_id': service_id
+                                }
+                            },
+                            'filter': {
+                                'range': {
+                                    'date': {
+                                        'gte': start_string,
+                                        'lte': end_string
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             ) as response:
-                results = await response.text()
+                result = await response.json()
 
     stream = web.StreamResponse()
     stream.content_type = 'application/json'
