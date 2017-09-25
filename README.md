@@ -147,3 +147,10 @@ terraform apply \
     -var 'backend_ami_id=SERVICE_AMI_ID' \
     -var 'key_name=SSH_KEY_NAME'
 ```
+
+## Credits
+
+Schema of the README file is distributed under CreativeCommons license
+(Attribution-NonCommercial-Share Alike 3.0) because of usage of SoftIcons
+(https://www.iconfinder.com/iconsets/softicons) by KyoTux.
+Icons have been integrated into the schema and resized.
