@@ -25,7 +25,10 @@ resource "aws_instance" "backend" {
   ami                 = "${var.backend_ami_id}" # (created by packer.json)
   instance_type       = "t2.micro"
   key_name            = "${var.key_name}"
-  security_groups     = ["${aws_security_group.allow_ssh.id}"]
+  security_groups     = [
+                            "${aws_security_group.allow_ssh.id}",
+                            "${aws_security_group.allow_all_outbound.id}"
+                        ]
   subnet_id           = "${aws_subnet.vpc_subnet.id}"
 
   tags {
@@ -96,11 +99,30 @@ resource "aws_security_group" "allow_ssh" {
     to_port           = 22
     protocol          = "tcp"
 
-    #NOTE: bad practice, a bastion is better
+    #FIXME: bad practice, a bastion is better
     cidr_blocks       = ["0.0.0.0/0"]
   }
 
   tags {
     Name              = "allow_ssh"
+  }
+}
+
+resource "aws_security_group" "allow_all_outbound" {
+  name                = "allow_all_outbound"
+  description         = "allow all outbound traffic"
+  vpc_id              = "${aws_vpc.vpc.id}"
+
+  egress {
+    from_port         = 0
+    to_port           = 0
+    protocol          = "-1" # all
+
+    #FIXME: bad practice, a bastion is better
+    cidr_blocks       = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name              = "allow_all_outbound"
   }
 }
