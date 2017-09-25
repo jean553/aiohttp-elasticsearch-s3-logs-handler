@@ -16,6 +16,8 @@
         - curl
         - python3.5
         - python-pip
+        - htop
+        - vim
 
     # npm is required by elasticdump and is not part of Debian stretch
     # repositories so we have to install it manually;
