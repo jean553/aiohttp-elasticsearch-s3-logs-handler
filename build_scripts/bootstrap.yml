@@ -57,3 +57,8 @@
       npm:
         name: elasticdump
         global: yes
+
+    - name: supervisor configuration copied into supervisor directory
+      copy:
+        src: /opt/applications/aiohttp-elasticsearch-s3-logs-handler/build_scripts/supervisor.conf
+        dest: /etc/supervisor/conf.d/aiohttp-elasticsearch-s3-logs-handler.conf
