@@ -150,6 +150,7 @@ terraform plan \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
     -var 'backend_ami_id=SERVICE_AMI_ID' \
+    -var 'es_ami_id=ES_AMI_ID' \
     -var 'key_name=SSH_KEY_NAME'
 
 terraform apply \
@@ -157,6 +158,7 @@ terraform apply \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
     -var 'backend_ami_id=SERVICE_AMI_ID' \
+    -var 'es_ami_id=ES_AMI_ID' \
     -var 'key_name=SSH_KEY_NAME'
 ```
 
