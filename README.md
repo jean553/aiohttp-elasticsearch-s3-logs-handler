@@ -125,7 +125,7 @@ packer build \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
-    packer.json
+    packer_backend.json
 ```
 
 ### Create the infrastructure with Terraform
