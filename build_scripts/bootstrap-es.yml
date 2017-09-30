@@ -4,7 +4,12 @@
 
   tasks:
 
-    - name: basic tools installed (supervisor, nginx, git, curl, pip)
+    - name: elasticsearch repository public key added
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+
+    - name: basic tools installed (apt-transport-https for ES)
       apt:
         name: "{{ item }}"
         state: present
@@ -12,3 +17,5 @@
       with_items:
         - htop
         - vim
+        - apt-transport-https
+        - elasticsearch
