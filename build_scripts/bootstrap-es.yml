@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  become: yes
+
+  tasks:
+
+    - name: basic tools installed (supervisor, nginx, git, curl, pip)
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - htop
+        - vim
