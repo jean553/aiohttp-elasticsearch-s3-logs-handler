@@ -115,10 +115,12 @@ The following commands have to be executed into the build scripts folder:
 cd build_scripts
 ```
 
-### Create the required AMI with Packer
+### Create the required AMIs with Packer
 
 Packer must be installed on your machine
 (https://www.packer.io/downloads.html).
+
+#### Build the backend AMI
 
 ```bash
 packer build \
@@ -126,6 +128,16 @@ packer build \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
     packer_backend.json
+```
+
+#### Build the Elasticsearch AMI
+
+```bash
+packer build \
+    -var 'access_key=ACCESS_KEY' \
+    -var 'secret_key=SECRET_KEY' \
+    -var 'region=REGION' \
+    packer_es.json
 ```
 
 ### Create the infrastructure with Terraform
