@@ -18,7 +18,7 @@
         {
             "type": "file",
             "destination": "/tmp/sources.list",
-            "source": "./service_sources.list"
+            "source": "./backend_sources.list"
         },
         {
             "type": "shell",
