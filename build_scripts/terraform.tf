@@ -2,6 +2,7 @@ variable "access_key" {}
 variable "secret_key" {}
 variable "region" {}
 variable "backend_ami_id" {}
+variable "es_ami_id" {}
 variable "key_name" {}
 
 provider "aws" {
@@ -10,19 +11,23 @@ provider "aws" {
   region         = "${var.region}"
 }
 
-resource "aws_instance" "elk" {
-  ami                 = "ami-0bd0cf6d" # (community) bitnami-elk-5.4.1-0-linux-debian-8-x86_64-hvm-ebs
+resource "aws_instance" "es" {
+  ami                 = "${var.es_ami_id}" # created by packer_es.json
   instance_type       = "t2.micro"
   key_name            = "${var.key_name}"
+  security_groups     = [
+                            "${aws_security_group.allow_ssh.id}",
+                            "${aws_security_group.allow_all_outbound.id}"
+                        ]
   subnet_id           = "${aws_subnet.vpc_subnet.id}"
 
   tags {
-    Name              = "aiohttp-elasticsearch-s3-logs-handler_elk"
+    Name              = "aiohttp-elasticsearch-s3-logs-handler_es"
   }
 }
 
 resource "aws_instance" "backend" {
-  ami                 = "${var.backend_ami_id}" # (created by packer.json)
+  ami                 = "${var.backend_ami_id}" # created by packer_backend.json
   instance_type       = "t2.micro"
   key_name            = "${var.key_name}"
   security_groups     = [
@@ -86,6 +91,12 @@ resource "aws_default_route_table" "vpc_default_route_table" {
 resource "aws_eip" "backend_eip" {
 
   instance            = "${aws_instance.backend.id}"
+  vpc                 = true
+}
+
+resource "aws_eip" "es_eip" {
+
+  instance            = "${aws_instance.es.id}"
   vpc                 = true
 }
 
