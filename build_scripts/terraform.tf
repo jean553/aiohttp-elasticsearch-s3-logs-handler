@@ -13,7 +13,7 @@ provider "aws" {
 
 resource "aws_instance" "es" {
   ami                 = "${var.es_ami_id}" # created by packer_es.json
-  instance_type       = "t2.micro"
+  instance_type       = "t2.medium" # Java 8 requires 2 Gb of RAM
   key_name            = "${var.key_name}"
   security_groups     = [
                             "${aws_security_group.allow_ssh.id}",

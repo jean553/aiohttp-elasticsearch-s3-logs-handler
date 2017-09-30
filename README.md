@@ -103,6 +103,8 @@ python tests/performance/performance_test.py
 
 ## Launch service into AWS Cloud
 
+*WARNING*: The AWS configuration launches some instances that are not part of the AWS Free tier.
+
 You must have an IAM user with the following permissions:
  * `AmazonEC2FullAccess`,
  * `AmazonS3FullAccess`

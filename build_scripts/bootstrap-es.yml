@@ -19,3 +19,4 @@
         - vim
         - apt-transport-https
         - elasticsearch
+        - openjdk-8-jre
