@@ -111,7 +111,7 @@ resource "aws_security_group" "allow_ssh" {
     to_port           = 22
     protocol          = "tcp"
 
-    #FIXME: bad practice, a bastion is better
+    #FIXME: #142 bad practice, a bastion is better
     cidr_blocks       = ["0.0.0.0/0"]
   }
 
@@ -130,7 +130,7 @@ resource "aws_security_group" "allow_http" {
     to_port           = 80
     protocol          = "http"
 
-    #FIXME: bad practice, a bastion is better
+    #FIXME: #142 bad practice, a bastion is better
     cidr_blocks       = ["0.0.0.0/0"]
   }
 
@@ -149,7 +149,7 @@ resource "aws_security_group" "allow_all_outbound" {
     to_port           = 0
     protocol          = "-1" # all
 
-    #FIXME: bad practice, a bastion is better
+    #FIXME: #142 bad practice, a bastion is better
     cidr_blocks       = ["0.0.0.0/0"]
   }
 
