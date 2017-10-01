@@ -62,3 +62,8 @@
       copy:
         src: /opt/applications/aiohttp-elasticsearch-s3-logs-handler/build_scripts/supervisor.conf
         dest: /etc/supervisor/conf.d/aiohttp-elasticsearch-s3-logs-handler.conf
+
+    - name: nginx site configuration copied into nginx directory
+      copy:
+        src: /opt/applications/aiohttp-elasticsearch-s3-logs-handler/build_scripts/nginx.conf
+        dest: /etc/nginx/sites-available/default
