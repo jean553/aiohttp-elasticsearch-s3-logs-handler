@@ -142,6 +142,25 @@ resource "aws_security_group" "allow_http" {
   }
 }
 
+resource "aws_security_group" "allow_elasticsearch" {
+  name                = "allow_elasticsearch"
+  description         = "allow only inbound elasticsearch traffic"
+  vpc_id              = "${aws_vpc.vpc.id}"
+
+  ingress {
+    from_port         = 9200
+    to_port           = 9200
+    protocol          = "tcp"
+
+    #FIXME: #142 bad practice, a bastion is better
+    cidr_blocks       = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name              = "allow_elasticsearch"
+  }
+}
+
 resource "aws_security_group" "allow_all_outbound" {
   name                = "allow_all_outbound"
   description         = "allow all outbound traffic"
