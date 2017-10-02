@@ -248,6 +248,7 @@ async def get_logs(
 
     stream.write(b']}')
 
+    # FIXME: #145 variable is referenced before assignment
     s3_client.close()
 
     return stream

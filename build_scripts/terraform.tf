@@ -17,9 +17,11 @@ resource "aws_instance" "es" {
   key_name            = "${var.key_name}"
   security_groups     = [
                             "${aws_security_group.allow_ssh.id}",
+                            "${aws_security_group.allow_elasticsearch.id}",
                             "${aws_security_group.allow_all_outbound.id}"
                         ]
   subnet_id           = "${aws_subnet.vpc_subnet.id}"
+  private_ip          = "10.0.0.11"
 
   tags {
     Name              = "aiohttp-elasticsearch-s3-logs-handler_es"
@@ -36,6 +38,7 @@ resource "aws_instance" "backend" {
                             "${aws_security_group.allow_all_outbound.id}"
                         ]
   subnet_id           = "${aws_subnet.vpc_subnet.id}"
+  private_ip          = "10.0.0.10"
 
   tags {
     Name              = "aiohttp-elasticsearch-s3-logs-handler_backend"
@@ -136,6 +139,25 @@ resource "aws_security_group" "allow_http" {
 
   tags {
     Name              = "allow_http"
+  }
+}
+
+resource "aws_security_group" "allow_elasticsearch" {
+  name                = "allow_elasticsearch"
+  description         = "allow only inbound elasticsearch traffic"
+  vpc_id              = "${aws_vpc.vpc.id}"
+
+  ingress {
+    from_port         = 9200
+    to_port           = 9200
+    protocol          = "tcp"
+
+    #FIXME: #142 bad practice, a bastion is better
+    cidr_blocks       = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name              = "allow_elasticsearch"
   }
 }
 

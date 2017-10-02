@@ -20,3 +20,14 @@
         - apt-transport-https
         - elasticsearch
         - openjdk-8-jre
+
+    - name: elasticsearch ready to listen from any source
+      lineinfile:
+        dest: /etc/elasticsearch/elasticsearch.yml
+        line: 'network.host: 0.0.0.0'
+
+    - name: elasticsearch ready to run after boot
+      service:
+        name: elasticsearch
+        state: started
+        enabled: true
