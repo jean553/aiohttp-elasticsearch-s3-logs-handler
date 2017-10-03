@@ -1,0 +1,37 @@
+---
+- hosts: localhost
+  become: yes
+
+  tasks:
+
+    - name: elasticsearch repository public key added
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+
+    - name: basic tools installed (apt-transport-https for ES)
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - htop
+        - vim
+        - apt-transport-https
+        - kibana
+
+    - name: kibana ready to listen from any source
+      lineinfile:
+        dest: /etc/kibana/kibana.yml
+        line: 'server.host: 0.0.0.0'
+
+    - name: kibana ready to use elasticsearch
+      lineinfile:
+        dest: /etc/kibana/kibana.yml
+        line: 'elasticsearch.url: 10.0.0.11:9200'
+
+    - name: kibana ready to run after boot
+      service:
+        name: kibana
+        state: started
+        enabled: true
