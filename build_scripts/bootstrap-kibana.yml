@@ -28,7 +28,7 @@
     - name: kibana ready to use elasticsearch
       lineinfile:
         dest: /etc/kibana/kibana.yml
-        line: 'elasticsearch.url: 10.0.0.11:9200'
+        line: 'elasticsearch.url: http://10.0.0.11:9200'
 
     - name: kibana ready to run after boot
       service:
