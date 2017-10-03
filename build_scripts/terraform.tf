@@ -3,12 +3,30 @@ variable "secret_key" {}
 variable "region" {}
 variable "backend_ami_id" {}
 variable "es_ami_id" {}
+variable "kibana_ami_id" {}
 variable "key_name" {}
 
 provider "aws" {
   access_key     = "${var.access_key}"
   secret_key     = "${var.secret_key}"
   region         = "${var.region}"
+}
+
+resource "aws_instance" "kibana" {
+  ami                 = "${var.kibana_ami_id}" # created by packer_es.json
+  instance_type       = "t2.micro"
+  key_name            = "${var.key_name}"
+  security_groups     = [
+                            "${aws_security_group.allow_ssh.id}",
+                            "${aws_security_group.allow_kibana.id}",
+                            "${aws_security_group.allow_all_outbound.id}"
+                        ]
+  subnet_id           = "${aws_subnet.vpc_subnet.id}"
+  private_ip          = "10.0.0.12"
+
+  tags {
+    Name              = "aiohttp-elasticsearch-s3-logs-handler_kibana"
+  }
 }
 
 resource "aws_instance" "es" {
@@ -104,6 +122,12 @@ resource "aws_eip" "es_eip" {
   vpc                 = true
 }
 
+resource "aws_eip" "kibana_eip" {
+
+  instance            = "${aws_instance.kibana.id}"
+  vpc                 = true
+}
+
 resource "aws_security_group" "allow_ssh" {
   name                = "allow_ssh"
   description         = "allow only inbound SSH traffic"
@@ -158,6 +182,25 @@ resource "aws_security_group" "allow_elasticsearch" {
 
   tags {
     Name              = "allow_elasticsearch"
+  }
+}
+
+resource "aws_security_group" "allow_kibana" {
+  name                = "allow_kibana"
+  description         = "allow only inbound kibana traffic"
+  vpc_id              = "${aws_vpc.vpc.id}"
+
+  ingress {
+    from_port         = 5601
+    to_port           = 5601
+    protocol          = "tcp"
+
+    #FIXME: #142 bad practice, a bastion is better
+    cidr_blocks       = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name              = "allow_kibana"
   }
 }
 

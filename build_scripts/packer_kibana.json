@@ -12,7 +12,7 @@
         "source_ami": "ami-440d4837", 
         "instance_type": "t2.micro",
         "ssh_username": "admin",
-        "ami_name": "aiohttp-elasticsearch-s3-logs-handler_es_ami"
+        "ami_name": "aiohttp-elasticsearch-s3-logs-handler_kibana_ami"
     }],
     "provisioners": [
         {
@@ -31,7 +31,7 @@
         },
         {
             "type": "ansible-local",
-            "playbook_file": "bootstrap-es.yml"
+            "playbook_file": "bootstrap-kibana.yml"
         }
     ]
 }
