@@ -4,7 +4,7 @@
 
   tasks:
 
-    - name: basic tools installed (git, pip, curl)
+    - name: basic tools installed (git, pip, curl, cron)
       apt:
         name: "{{ item }}"
         state: present
@@ -16,6 +16,7 @@
         - python-pip
         - htop
         - vim
+        - cron
 
     # npm is required by elasticdump and is not part of Debian stretch
     # repositories so we have to install it manually;
