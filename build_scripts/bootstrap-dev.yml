@@ -42,7 +42,7 @@
       cron:
         name: "automatic indices snapshot to s3"
         minute: "0"
-        job: "python /vagrant/build_scripts/scripts/make_snapshot.py"
+        job: "python /vagrant/build_scripts/scripts/create_snapshot.py"
         cron_file: /etc/cron.d/snapshot
         user: root
 
