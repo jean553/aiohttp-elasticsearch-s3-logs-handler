@@ -63,7 +63,7 @@
         minute: "0"
         job: "BUCKET_NAME=aiohttp-elasticsearch-s3-logs-handler \
               ELASTICSEARCH_HOSTNAME=10.0.0.11 \
-              python /opt/applications/aiohttp-elasticsearch-s3-logs-handler/build_scripts/scripts/make_snapshot.py"
+              /opt/virtual_env35/bin/python /opt/applications/aiohttp-elasticsearch-s3-logs-handler/build_scripts/scripts/make_snapshot.py"
         cron_file: /etc/cron.d/snapshot
         user: root
 
