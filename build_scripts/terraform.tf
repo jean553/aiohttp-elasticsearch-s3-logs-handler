@@ -4,12 +4,29 @@ variable "region" {}
 variable "backend_ami_id" {}
 variable "es_ami_id" {}
 variable "kibana_ami_id" {}
+variable "worker_ami_id" {}
 variable "key_name" {}
 
 provider "aws" {
   access_key     = "${var.access_key}"
   secret_key     = "${var.secret_key}"
   region         = "${var.region}"
+}
+
+resource "aws_instance" "worker" {
+  ami                 = "${var.worker_ami_id}" # created by packer_es.json
+  instance_type       = "t2.micro"
+  key_name            = "${var.key_name}"
+  security_groups     = [
+                            "${aws_security_group.allow_ssh.id}",
+                            "${aws_security_group.allow_all_outbound.id}"
+                        ]
+  subnet_id           = "${aws_subnet.vpc_subnet.id}"
+  private_ip          = "10.0.0.13"
+
+  tags {
+    Name              = "aiohttp-elasticsearch-s3-logs-handler_worker"
+  }
 }
 
 resource "aws_instance" "kibana" {
@@ -111,20 +128,22 @@ resource "aws_default_route_table" "vpc_default_route_table" {
 }
 
 resource "aws_eip" "backend_eip" {
-
   instance            = "${aws_instance.backend.id}"
   vpc                 = true
 }
 
 resource "aws_eip" "es_eip" {
-
   instance            = "${aws_instance.es.id}"
   vpc                 = true
 }
 
 resource "aws_eip" "kibana_eip" {
-
   instance            = "${aws_instance.kibana.id}"
+  vpc                 = true
+}
+
+resource "aws_eip" "worker_eip" {
+  instance            = "${aws_instance.worker.id}"
   vpc                 = true
 }
 

@@ -11,12 +11,21 @@ import boto3
 from elasticsearch import Elasticsearch
 
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
-AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
-S3_ENDPOINT = os.getenv('S3_ENDPOINT')
-S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
-ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
+assert AWS_ACCESS_KEY is not None
 
-ELASTICSEARCH_ENDPOINT = 'http://elasticsearch:9200'
+AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
+assert AWS_SECRET_KEY is not None
+
+S3_ENDPOINT = os.getenv('S3_ENDPOINT')
+assert S3_ENDPOINT is not None
+
+S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+assert S3_BUCKET_NAME is not None
+
+ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
+assert ELASTICSEARCH_HOSTNAME is not None
+
+ELASTICSEARCH_ENDPOINT = 'http://{}:9200'.format(ELASTICSEARCH_HOSTNAME)
 SNAPSHOTS_DIRECTORY = '/tmp/snapshots'
 SNAPSHOT_DAYS_FROM_NOW = 10
 

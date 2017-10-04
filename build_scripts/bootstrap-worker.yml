@@ -4,7 +4,7 @@
 
   tasks:
 
-    - name: basic tools installed (git, pip, curl)
+    - name: basic tools installed (git, pip, curl, cron)
       apt:
         name: "{{ item }}"
         state: present
@@ -16,6 +16,7 @@
         - python-pip
         - htop
         - vim
+        - cron
 
     # npm is required by elasticdump and is not part of Debian stretch
     # repositories so we have to install it manually;
@@ -55,3 +56,21 @@
       npm:
         name: elasticdump
         global: yes
+
+    - name: automatic s3 snapshot cron task created
+      cron:
+        name: "automatic indices snapshot to s3"
+        minute: "0"
+        job: "BUCKET_NAME=aiohttp-elasticsearch-s3-logs-handler \
+              ELASTICSEARCH_HOSTNAME=10.0.0.11 \
+              python /opt/applications/aiohttp-elasticsearch-s3-logs-handler/build_scripts/scripts/make_snapshot.py"
+        cron_file: /etc/cron.d/snapshot
+        user: root
+
+    - name: snapshots directory created
+      file:
+        path: /tmp/snapshots
+        state: directory
+        # full directory access
+        owner: admin
+        group: admin
