@@ -195,10 +195,12 @@ resource "aws_security_group" "allow_elasticsearch" {
     to_port           = 9200
     protocol          = "tcp"
 
-    # Elasticsearch actions can only be performed from the backend and Kibana
+    # Elasticsearch actions can only be performed
+    # from the backend, Kibana and the worker
     cidr_blocks       = [
                             "10.0.0.10/32",
-                            "10.0.0.12/32"
+                            "10.0.0.12/32",
+                            "10.0.0.13/32"
                         ]
   }
 
