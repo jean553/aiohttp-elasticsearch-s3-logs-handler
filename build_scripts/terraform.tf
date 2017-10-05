@@ -13,6 +13,32 @@ provider "aws" {
   region         = "${var.region}"
 }
 
+# TODO: #153 the used IAM role must allow IAM management rights
+resource "aws_iam_role" "worker_s3_access_role" {
+  name                = "aiohttp-elasticsearch-s3-logs-handler_worker-s3-access-role"
+  assume_role_policy  = <<EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "s3:*"
+        ],
+        "Resource": [
+          "arn:aws:s3:::aiohttp-elasticsearch-s3-logs-handler"
+        ],
+        "Effect": "Allow"
+      }
+    ]
+  }
+EOF
+}
+
+resource "aws_iam_instance_profile" "worker_instance_profile" {
+  name                = "worker_instance_profile"
+  role                = "worker_s3_access_role"
+}
+
 resource "aws_instance" "worker" {
   ami                 = "${var.worker_ami_id}" # created by packer_es.json
   instance_type       = "t2.micro"
@@ -27,6 +53,8 @@ resource "aws_instance" "worker" {
   tags {
     Name              = "aiohttp-elasticsearch-s3-logs-handler_worker"
   }
+
+  iam_instance_profile = "${aws_iam_instance_profile.worker_instance_profile.id}"
 }
 
 resource "aws_instance" "kibana" {
