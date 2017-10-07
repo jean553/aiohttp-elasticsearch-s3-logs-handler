@@ -66,11 +66,3 @@
               /opt/virtual_env35/bin/python /opt/applications/aiohttp-elasticsearch-s3-logs-handler/build_scripts/scripts/make_snapshot.py"
         cron_file: /etc/cron.d/snapshot
         user: root
-
-    - name: snapshots directory created
-      file:
-        path: /tmp/snapshots
-        state: directory
-        # full directory access
-        owner: admin
-        group: admin
