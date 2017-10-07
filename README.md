@@ -168,6 +168,17 @@ terraform apply \
     -var 'key_name=SSH_KEY_NAME'
 ```
 
+### Allow the worker to upload into S3
+
+Connect using SSH to the worker machine:
+
+```bash
+ssh admin@worker-elastic-ip -i key.pem
+```
+
+Edit the file `/etc/cron.d/snapshot` and set the AWS credentials.
+Cron does not need to be restarted.
+
 ## Credits
 
 Schema of the README file is distributed under CreativeCommons license
