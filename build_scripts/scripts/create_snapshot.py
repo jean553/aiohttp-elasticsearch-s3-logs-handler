@@ -16,17 +16,16 @@ assert AWS_ACCESS_KEY is not None
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 assert AWS_SECRET_KEY is not None
 
-S3_ENDPOINT = os.getenv('S3_ENDPOINT')
-assert S3_ENDPOINT is not None
-
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 assert S3_BUCKET_NAME is not None
 
 ELASTICSEARCH_HOSTNAME = os.getenv('ELASTICSEARCH_HOSTNAME')
 assert ELASTICSEARCH_HOSTNAME is not None
 
+S3_ENDPOINT = os.getenv('S3_ENDPOINT')
+
 ELASTICSEARCH_ENDPOINT = 'http://{}:9200'.format(ELASTICSEARCH_HOSTNAME)
-SNAPSHOTS_DIRECTORY = '/tmp/snapshots'
+SNAPSHOTS_DIRECTORY = '/tmp'
 SNAPSHOT_DAYS_FROM_NOW = 10
 
 
@@ -123,7 +122,8 @@ def main():
         's3',
         aws_access_key_id=AWS_ACCESS_KEY,
         aws_secret_access_key=AWS_SECRET_KEY,
-        endpoint_url='http://{}'.format(S3_ENDPOINT),
+        # the custom endpoint is only required on dev environment
+        endpoint_url='http://{}'.format(S3_ENDPOINT) if S3_ENDPOINT else None,
     )
     s3_transfer = boto3.s3.transfer.S3Transfer(s3_client)
 
