@@ -67,26 +67,85 @@ def get_data_indices():
     ]
 
 
-def generate_snapshot(index_name):
+def _get_log_to_string(log: Any) -> str:
+    '''
+    Returns a string representation of the given log.
+    Convert single quotes to double quotes in order to match with JSON format
+    (required for streaming)
+    '''
+    return str(log['_source']).replace("'", '"')
+
+
+async def _get_logs_from_elasticsearch(index_name: str) -> dict:
     '''
     Generate the dump for the given index
     and stores it into the snapshots directory.
-
-    Args:
-        index_name(str): name of the index
     '''
-    os.system(
-        '''
-        elasticdump \
-            --input=%(elasticsearch_endpoint)s/%(index_name)s \
-            --output=%(snapshots_directory)s/%(index_name)s \
-            --type=data
-        ''' % ({
-            'index_name': index_name,
-            'snapshots_directory': SNAPSHOTS_DIRECTORY,
-            'elasticsearch_endpoint': ELASTICSEARCH_ENDPOINT,
-        })
-    )
+    async with aiohttp.ClientSession() as session:
+        with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
+            async with session.get(
+                    'http://{}:{}/{}/_search?scroll={}'.format(
+                    ELASTICSEARCH_HOSTNAME,
+                    ELASTICSEARCH_PORT,
+                    index_name,
+                    ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME,
+                ),
+                json={
+                    'size': ELASTICSEARCH_MAXIMUM_RESULTS_PER_PAGE,
+                }
+            ) as response:
+                return await response.json()
+
+
+async def _scroll_logs_from_elasticsearch(scroll_id: str) -> dict:
+    '''
+    Scroll the next page of found results from Elasticsearch.
+    '''
+    # TODO: #123 we use a new session for one request here;
+    # if we try to use the same session as before,
+    # then not all the logs are returned from ES;
+    # we have to investigate how to organize the session(s) here
+    async with aiohttp.ClientSession() as session:
+        with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
+            async with session.get(
+                    'http://{}:{}/_search/scroll'.format(
+                        ELASTICSEARCH_HOSTNAME,
+                        ELASTICSEARCH_PORT,
+                    ),
+                json={
+                    'scroll': ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME,
+                    'scroll_id': scroll_id
+                }
+            ) as response:
+                return await response.json()
+
+
+async def generate_snapshot(index_name: str):
+    '''
+    Stream one index content from ES
+    and stores it into a file for upload
+    '''
+    result = await _get_logs_from_elasticsearch(index_name)
+
+    scroll_id = result['_scroll_id']
+    logs = result['hits']['hits']
+    elasticsearch_logs_amount = len(logs)
+
+    with open('/tmp/{}'.format(index_name), 'w') as logs_file:
+
+        for log in logs:
+            logs_file.write(_get_log_to_string(log))
+
+        while elasticsearch_logs_amount > 0:
+            result = await _scroll_logs_from_elasticsearch(scroll_id)
+
+            scroll_id = result['_scroll_id']
+            logs = result['hits']['hits']
+
+            for log in logs:
+                logs_file.write(_get_log_to_string(log))
+
+            elasticsearch_logs_amount = len(logs)
 
 
 def upload_snapshot(
@@ -124,9 +183,9 @@ def remove_index(
     )
 
 
-def main():
+async def run():
     '''
-    Script entry point.
+    Main script.
     '''
 
     s3_client = boto3.client(
@@ -143,7 +202,7 @@ def main():
     indices = get_data_indices()
 
     for index in indices:
-        generate_snapshot(index)
+        await generate_snapshot(index)
         upload_snapshot(
             s3_transfer,
             index,
@@ -152,6 +211,15 @@ def main():
             es_client,
             index,
         )
+
+
+def main():
+    '''
+    Script entry point.
+    '''
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run())
+    loop.close()
 
 
 if __name__ == '__main__':
