@@ -5,8 +5,12 @@ Creates a snapshot of for one index.
 import os
 import requests
 from datetime import datetime, timedelta
+import async_timeout
+import asyncio
+from typing import Any
 
 import boto3
+import aiohttp
 
 from elasticsearch import Elasticsearch
 
