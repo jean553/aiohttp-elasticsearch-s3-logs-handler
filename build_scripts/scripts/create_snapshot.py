@@ -30,19 +30,20 @@ assert ELASTICSEARCH_HOSTNAME is not None
 ELASTICSEARCH_PORT = os.getenv('ELASTICSEARCH_PORT')
 assert ELASTICSEARCH_PORT is not None
 
+# optional because only required on development
+# environment as we use a fake S3 service
 S3_ENDPOINT = os.getenv('S3_ENDPOINT')
 
 ELASTICSEARCH_ENDPOINT = 'http://{}:9200'.format(ELASTICSEARCH_HOSTNAME)
 SNAPSHOTS_DIRECTORY = '/tmp'
 SNAPSHOT_DAYS_FROM_NOW = 10
 LOGS_FILES_OPEN_METHOD = 'w'
-
 ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS = 10
 ELASTICSEARCH_MAXIMUM_RESULTS_PER_PAGE = 10
 ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME = '1m'  # 1 minute
 
 
-def get_data_indices() -> list:
+def _get_data_indices() -> list:
     '''
     Returns the list of data indices (data-* format).
     '''
@@ -119,7 +120,7 @@ async def _scroll_logs_from_elasticsearch(scroll_id: str) -> dict:
                 return await response.json()
 
 
-async def generate_snapshot(index_name: str):
+async def _generate_snapshot(index_name: str):
     '''
     Stream one index content from ES
     and stores it into a file for upload
@@ -153,7 +154,7 @@ async def generate_snapshot(index_name: str):
             elasticsearch_logs_amount = len(logs)
 
 
-def upload_snapshot(
+def _upload_snapshot(
     s3_transfer: S3Transfer,
     index_name: str,
 ):
@@ -167,7 +168,7 @@ def upload_snapshot(
     )
 
 
-def remove_index(
+def _remove_index(
     es_client: Elasticsearch,
     index_name: str,
 ):
@@ -184,7 +185,7 @@ def remove_index(
     )
 
 
-async def run():
+async def _run():
     '''
     Main script.
     '''
@@ -200,15 +201,15 @@ async def run():
 
     es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
 
-    indices = get_data_indices()
+    indices = _get_data_indices()
 
     for index in indices:
-        await generate_snapshot(index)
-        upload_snapshot(
+        await _generate_snapshot(index)
+        _upload_snapshot(
             s3_transfer,
             index,
         )
-        remove_index(
+        _remove_index(
             es_client,
             index,
         )
@@ -219,7 +220,7 @@ def main():
     Script entry point.
     '''
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(run())
+    loop.run_until_complete(_run())
     loop.close()
 
 
