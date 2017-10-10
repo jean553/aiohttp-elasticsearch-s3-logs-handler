@@ -10,6 +10,7 @@ import asyncio
 from typing import Any
 
 import boto3
+from boto3.s3.transfer import S3Transfer
 import aiohttp
 
 from elasticsearch import Elasticsearch
@@ -41,12 +42,9 @@ ELASTICSEARCH_MAXIMUM_RESULTS_PER_PAGE = 10
 ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME = '1m'  # 1 minute
 
 
-def get_data_indices():
+def get_data_indices() -> list:
     '''
     Returns the list of data indices (data-* format).
-
-    Returns:
-        (list): list of indices names
     '''
     now = datetime.now()
     snapshot_datetime = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
@@ -156,15 +154,11 @@ async def generate_snapshot(index_name: str):
 
 
 def upload_snapshot(
-    s3_transfer,
-    index_name,
+    s3_transfer: S3Transfer,
+    index_name: str,
 ):
     '''
     Uploads the dump for the given index into S3.
-
-    Args:
-        s3_transfer(boto3.s3.transfer.S3Transfer)
-        index_name(str): name of the index
     '''
     s3_transfer.upload_file(
         SNAPSHOTS_DIRECTORY + '/' + index_name,
@@ -174,8 +168,8 @@ def upload_snapshot(
 
 
 def remove_index(
-    es_client,
-    index_name,
+    es_client: Elasticsearch,
+    index_name: str,
 ):
     '''
     Removes the given index from elasticsearch.
@@ -202,7 +196,7 @@ async def run():
         # the custom endpoint is only required on dev environment
         endpoint_url='http://{}'.format(S3_ENDPOINT) if S3_ENDPOINT else None,
     )
-    s3_transfer = boto3.s3.transfer.S3Transfer(s3_client)
+    s3_transfer = S3Transfer(s3_client)
 
     es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
 
