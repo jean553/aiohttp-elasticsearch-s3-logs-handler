@@ -226,7 +226,7 @@ async def get_logs(
                 temp_line = s3_line.decode('utf-8')
                 line_items = json.loads(temp_line)
                 log_date = datetime.strptime(
-                    line_items['_source']['date'],
+                    line_items['date'],
                     '%Y-%m-%dT%H:%M:%S',
                 )
 
@@ -234,7 +234,7 @@ async def get_logs(
                     s3_line = await s3_stream.readline()
                     continue
 
-                line = _get_log_to_string(line_items)
+                line = str(line_items).replace("'", '"')
 
                 if not first_iteration:
                     line = ',' + line
