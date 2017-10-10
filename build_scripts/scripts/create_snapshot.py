@@ -34,6 +34,7 @@ S3_ENDPOINT = os.getenv('S3_ENDPOINT')
 ELASTICSEARCH_ENDPOINT = 'http://{}:9200'.format(ELASTICSEARCH_HOSTNAME)
 SNAPSHOTS_DIRECTORY = '/tmp'
 SNAPSHOT_DAYS_FROM_NOW = 10
+LOGS_FILES_OPEN_METHOD = 'w'
 
 ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS = 10
 ELASTICSEARCH_MAXIMUM_RESULTS_PER_PAGE = 10
@@ -84,7 +85,7 @@ async def _get_logs_from_elasticsearch(index_name: str) -> dict:
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
             async with session.get(
-                    'http://{}:{}/{}/_search?scroll={}'.format(
+                'http://{}:{}/{}/_search?scroll={}'.format(
                     ELASTICSEARCH_HOSTNAME,
                     ELASTICSEARCH_PORT,
                     index_name,
@@ -108,10 +109,10 @@ async def _scroll_logs_from_elasticsearch(scroll_id: str) -> dict:
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
             async with session.get(
-                    'http://{}:{}/_search/scroll'.format(
-                        ELASTICSEARCH_HOSTNAME,
-                        ELASTICSEARCH_PORT,
-                    ),
+                'http://{}:{}/_search/scroll'.format(
+                    ELASTICSEARCH_HOSTNAME,
+                    ELASTICSEARCH_PORT,
+                ),
                 json={
                     'scroll': ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME,
                     'scroll_id': scroll_id
@@ -131,7 +132,13 @@ async def generate_snapshot(index_name: str):
     logs = result['hits']['hits']
     elasticsearch_logs_amount = len(logs)
 
-    with open('/tmp/{}'.format(index_name), 'w') as logs_file:
+    with open(
+        '{}/{}'.format(
+            SNAPSHOTS_DIRECTORY,
+            index_name,
+        ),
+        LOGS_FILES_OPEN_METHOD,
+    ) as logs_file:
 
         for log in logs:
             logs_file.write(_get_log_to_string(log))
