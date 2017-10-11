@@ -154,18 +154,23 @@ async def _generate_snapshot(index_name: str):
             elasticsearch_logs_amount = len(logs)
 
 
-def _upload_snapshot(
+def _handle_snapshot(
     s3_transfer: S3Transfer,
     index_name: str,
 ):
     '''
-    Uploads the dump for the given index into S3.
+    Uploads the dump for the given index into S3
+    and remove the logs file.
     '''
+    file_path = SNAPSHOTS_DIRECTORY + '/' + index_name
+
     s3_transfer.upload_file(
-        SNAPSHOTS_DIRECTORY + '/' + index_name,
+        file_path,
         S3_BUCKET_NAME,
         index_name,
     )
+
+    os.remove(file_path)
 
 
 def _remove_index(
@@ -205,7 +210,7 @@ async def _run():
 
     for index in indices:
         await _generate_snapshot(index)
-        _upload_snapshot(
+        _handle_snapshot(
             s3_transfer,
             index,
         )
