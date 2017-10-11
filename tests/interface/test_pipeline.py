@@ -627,3 +627,47 @@ def test_get_high_logs_amount_from_es():
     )
     assert response.status_code == 200
     assert len(response.json()['logs']) == 12000
+
+
+def test_get_high_logs_amount_from_s3():
+    '''
+    Posts more than ten thousand logs and tries to get them into one request.
+    '''
+    _empty_s3_bucket()
+    es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
+    remove_all_data_indices(es_client)
+    time.sleep(WAIT_TIME)
+
+    # August 9th, 2017 06:56:12 pm
+    start_timestamp = 1502304972
+
+    # August 9th, 2017 08:36:12 pm
+    end_timestamp = 1502310972
+
+    logs = []
+    for timestamp in range(start_timestamp, end_timestamp):
+        logs.append({
+            '_type': 'logs',
+            'service_id': '1',
+            'message': 'message {}'.format(timestamp),
+            'level': 'level {}'.format(timestamp),
+            'category': 'category {}'.format(timestamp),
+            'date': datetime.utcfromtimestamp(float(timestamp)),
+        })
+
+    # insert 6000 logs into one index
+    helpers.bulk(
+        es_client,
+        logs,
+        index='data-1-2017-08-09',
+    )
+    time.sleep(WAIT_TIME)
+
+    _execute_snapshot_script()
+    time.sleep(WAIT_TIME)
+
+    response = requests.get(
+        '%s/logs/2017-08-05-00-00-00/2017-08-15-00-00-00' % BASE_URL,
+    )
+    assert response.status_code == 200
+    assert len(response.json()['logs']) == 6000

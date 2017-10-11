@@ -73,7 +73,7 @@ def _get_log_to_string(log: Any) -> str:
     Convert single quotes to double quotes in order to match with JSON format
     (required for streaming)
     '''
-    return str(log['_source']).replace("'", '"')
+    return str(log['_source']).replace("'", '"') + '\n'
 
 
 async def _get_logs_from_elasticsearch(index_name: str) -> dict:
