@@ -1,7 +1,7 @@
 # aiohttp-elasticsearch-s3-logs-handler
 
 Asynchronous non-blocking logs handler using Elasticsearch for short-term storage
-and Amazon S3 for long-term storage. Streams content to monitoring client.
+and Amazon S3 for long-term storage.
 
 ![Image 1](resources/architecture.png)
 
@@ -84,15 +84,6 @@ http://kibana-container-ip-address:5601
 This IP address can be found using `docker inspect aiohttp-elasticsearch-s3-logs-handler_kibana`.
 The index pattern is `data-*`.
 
-## Snapshot to JSON file using Elasticdump
-
-```bash
-elasticdump \
-    --input=http://elasticsearch:9200/data-1-20-17-08-01 \
-    --output=result.json \
-    --type=data
-```
-
 ## Performance tests
 
 This test performs a lot of POST requests for many logs from many TSV files.
@@ -103,26 +94,27 @@ python tests/performance/performance_test.py
 
 ## Launch service into AWS Cloud
 
-*WARNING*: The AWS configuration launches some instances that are not part of the AWS Free tier.
+*WARNING*: The AWS configuration launches some instances
+that are not part of the AWS Free tier.
 
 You must have an IAM user with the following permissions:
  * `AmazonEC2FullAccess`,
  * `AmazonS3FullAccess`
 
-Furthermore, you have to create a key pair file, and using the name as `key_name` below.
-
-The following commands have to be executed into the build scripts folder:
-
-```bash
-cd build_scripts
-```
+Furthermore, you have to create a key pair file,
+and using the name as `key_name` below.
 
 ### Create the required AMIs with Packer
 
 Packer must be installed on your machine
 (https://www.packer.io/downloads.html).
 
-#### Build the backend AMI
+The following commands have to be executed into the `build_scripts/` folder.
+They build the following AMIs:
+ * backend,
+ * elasticsearch,
+ * kibana,
+ * worker
 
 ```bash
 packer build \
@@ -132,14 +124,28 @@ packer build \
     packer_backend.json
 ```
 
-#### Build the Elasticsearch AMI
-
 ```bash
 packer build \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
     packer_es.json
+```
+
+```bash
+packer build \
+    -var 'access_key=ACCESS_KEY' \
+    -var 'secret_key=SECRET_KEY' \
+    -var 'region=REGION' \
+    packer_kibana.json
+```
+
+```bash
+packer build \
+    -var 'access_key=ACCESS_KEY' \
+    -var 'secret_key=SECRET_KEY' \
+    -var 'region=REGION' \
+    packer_worker.json
 ```
 
 ### Create the infrastructure with Terraform
