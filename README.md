@@ -124,14 +124,28 @@ packer build \
     packer_backend.json
 ```
 
-#### Build the Elasticsearch AMI
-
 ```bash
 packer build \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
     packer_es.json
+```
+
+```bash
+packer build \
+    -var 'access_key=ACCESS_KEY' \
+    -var 'secret_key=SECRET_KEY' \
+    -var 'region=REGION' \
+    packer_kibana.json
+```
+
+```bash
+packer build \
+    -var 'access_key=ACCESS_KEY' \
+    -var 'secret_key=SECRET_KEY' \
+    -var 'region=REGION' \
+    packer_worker.json
 ```
 
 ### Create the infrastructure with Terraform
