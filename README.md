@@ -94,26 +94,27 @@ python tests/performance/performance_test.py
 
 ## Launch service into AWS Cloud
 
-*WARNING*: The AWS configuration launches some instances that are not part of the AWS Free tier.
+*WARNING*: The AWS configuration launches some instances
+that are not part of the AWS Free tier.
 
 You must have an IAM user with the following permissions:
  * `AmazonEC2FullAccess`,
  * `AmazonS3FullAccess`
 
-Furthermore, you have to create a key pair file, and using the name as `key_name` below.
-
-The following commands have to be executed into the build scripts folder:
-
-```bash
-cd build_scripts
-```
+Furthermore, you have to create a key pair file,
+and using the name as `key_name` below.
 
 ### Create the required AMIs with Packer
 
 Packer must be installed on your machine
 (https://www.packer.io/downloads.html).
 
-#### Build the backend AMI
+The following commands have to be executed into the `build_scripts/` folder.
+They build the following AMIs:
+ * backend,
+ * elasticsearch,
+ * kibana,
+ * worker
 
 ```bash
 packer build \
