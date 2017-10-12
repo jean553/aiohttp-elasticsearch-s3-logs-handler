@@ -1,7 +1,7 @@
 # aiohttp-elasticsearch-s3-logs-handler
 
 Asynchronous non-blocking logs handler using Elasticsearch for short-term storage
-and Amazon S3 for long-term storage. Streams content to monitoring client.
+and Amazon S3 for long-term storage.
 
 ![Image 1](resources/architecture.png)
 
