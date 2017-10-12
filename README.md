@@ -84,15 +84,6 @@ http://kibana-container-ip-address:5601
 This IP address can be found using `docker inspect aiohttp-elasticsearch-s3-logs-handler_kibana`.
 The index pattern is `data-*`.
 
-## Snapshot to JSON file using Elasticdump
-
-```bash
-elasticdump \
-    --input=http://elasticsearch:9200/data-1-20-17-08-01 \
-    --output=result.json \
-    --type=data
-```
-
 ## Performance tests
 
 This test performs a lot of POST requests for many logs from many TSV files.
