@@ -9,7 +9,7 @@
         "access_key": "{{user `access_key`}}",
         "secret_key": "{{user `secret_key`}}",
         "region": "{{user `region`}}",
-        "source_ami": "ami-440d4837", 
+        "source_ami": "ami-055fe978", 
         "instance_type": "t2.micro",
         "ssh_username": "admin",
         "ami_name": "aiohttp-elasticsearch-s3-logs-handler_worker_ami"
