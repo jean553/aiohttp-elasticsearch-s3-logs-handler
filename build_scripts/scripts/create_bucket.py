@@ -1,5 +1,7 @@
 #!/usr/bin/python
 '''
+This script creates a bucket in the S3 service (or a fake S3 service for development).
+It's used to set up the storage environment for the logs service.
 Creates a dummy bucket inside the S3 fake service.
 '''
 

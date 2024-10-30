@@ -1,4 +1,6 @@
 '''
+This file manages the configuration for the logs service.
+It loads environment variables and ensures they are set correctly.
 Loads the configuration from the environment variable,
 prevents the service to start if the variable cannot be found
 '''
