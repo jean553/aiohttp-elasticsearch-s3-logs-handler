@@ -6,10 +6,6 @@ It sets up an aiohttp web application with routes for posting and retrieving log
 
 The service uses Elasticsearch as its backend for storing and querying logs.
 
-Routes:
-- POST /api/1/service/{id}/logs: Add logs for a specific service
-- GET /api/1/service/{id}/logs/{start}/{end}: Retrieve logs for a specific service within a time range
-
 Starts the service.
 """
 
