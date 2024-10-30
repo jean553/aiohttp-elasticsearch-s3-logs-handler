@@ -1,4 +1,6 @@
 '''
+This file contains utility functions for interacting with Elasticsearch
+during interface tests, such as removing all data indices.
 Elasticsearch client routines for tests
 '''
 

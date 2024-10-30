@@ -1,4 +1,6 @@
 '''
+This file contains the handler for POST /logs requests.
+It processes incoming log data and saves it to Elasticsearch.
 Handles POST /logs requests.
 '''
 from datetime import datetime

@@ -1,4 +1,6 @@
 '''
+This file contains interface tests for the logs handlers.
+It tests both POST and GET endpoints for the logs service.
 Tests for POST logs
 '''
 import os

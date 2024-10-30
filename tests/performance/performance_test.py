@@ -1,4 +1,7 @@
 '''
+This script performs a high-volume performance test on the logs service.
+It sends a large number of log entries to test how the service handles
+massive write operations.
 This script is used for tests purposes only.
 
 Execute massive amount of POST logs in order to monitor

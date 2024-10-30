@@ -1,5 +1,7 @@
 #!/usr/bin/python
 '''
+This script creates a new S3 bucket for storing log snapshots.
+It is typically used in development environments with a fake S3 service.
 Creates a dummy bucket inside the S3 fake service.
 '''
 

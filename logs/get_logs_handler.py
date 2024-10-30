@@ -1,4 +1,7 @@
 '''
+This file contains the handler for GET /logs requests.
+It retrieves logs from Elasticsearch and S3 based on the specified date range,
+and returns them to the client.
 Handles GET /logs requests.
 '''
 import json

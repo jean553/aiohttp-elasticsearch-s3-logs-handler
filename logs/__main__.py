@@ -1,4 +1,6 @@
 '''
+This is the main entry point for the logs service.
+It sets up the aiohttp web application and defines the API routes.
 Starts the service.
 '''
 

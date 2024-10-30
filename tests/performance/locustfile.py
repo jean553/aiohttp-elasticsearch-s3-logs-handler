@@ -1,4 +1,6 @@
 '''
+This file defines Locust tasks for load testing the logs service.
+It simulates user behavior for posting and retrieving logs.
 Locust file for loading tests purposes.
 '''
 from locust import HttpLocust, TaskSet, task
