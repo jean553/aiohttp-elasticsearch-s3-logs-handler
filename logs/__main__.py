@@ -21,7 +21,7 @@ def main():
     '''
     Service starting function.
     '''
-    logger.info("Starting the logs service")
+    logger.info("Démarrage du service de logs")
     
     app = web.Application()
 
