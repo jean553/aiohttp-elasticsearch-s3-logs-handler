@@ -15,6 +15,7 @@ import aiohttp
 
 from elasticsearch import Elasticsearch
 
+# Environment variables
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 assert AWS_ACCESS_KEY is not None
 
@@ -30,10 +31,10 @@ assert ELASTICSEARCH_HOSTNAME is not None
 ELASTICSEARCH_PORT = os.getenv('ELASTICSEARCH_PORT')
 assert ELASTICSEARCH_PORT is not None
 
-# optional because only required on development
-# environment as we use a fake S3 service
+# Optional: only required for development environment with fake S3 service
 S3_ENDPOINT = os.getenv('S3_ENDPOINT')
 
+# Constants
 ELASTICSEARCH_ENDPOINT = 'http://{}:9200'.format(ELASTICSEARCH_HOSTNAME)
 SNAPSHOTS_DIRECTORY = '/tmp'
 SNAPSHOT_DAYS_FROM_NOW = 10
@@ -45,7 +46,7 @@ ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME = '1m'  # 1 minute
 
 def _get_data_indices() -> list:
     '''
-    Returns the list of data indices (data-* format).
+    Returns the list of data indices (data-* format) that are older than SNAPSHOT_DAYS_FROM_NOW.
     '''
     now = datetime.now()
     snapshot_datetime = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
@@ -70,16 +71,14 @@ def _get_data_indices() -> list:
 def _get_log_to_string(log: Any) -> str:
     '''
     Returns a string representation of the given log.
-    Convert single quotes to double quotes in order to match with JSON format
-    (required for streaming)
+    Convert single quotes to double quotes to match JSON format (required for streaming).
     '''
     return str(log['_source']).replace("'", '"') + '\n'
 
 
 async def _get_logs_from_elasticsearch(index_name: str) -> dict:
     '''
-    Generate the dump for the given index
-    and stores it into the snapshots directory.
+    Retrieve the initial batch of logs for the given index from Elasticsearch.
     '''
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
@@ -99,7 +98,7 @@ async def _get_logs_from_elasticsearch(index_name: str) -> dict:
 
 async def _scroll_logs_from_elasticsearch(scroll_id: str) -> dict:
     '''
-    Scroll the next page of found results from Elasticsearch.
+    Scroll the next page of found results from Elasticsearch using the provided scroll_id.
     '''
     # TODO: #123 we use a new session for one request here;
     # if we try to use the same session as before,
@@ -122,8 +121,7 @@ async def _scroll_logs_from_elasticsearch(scroll_id: str) -> dict:
 
 async def _generate_snapshot(index_name: str):
     '''
-    Stream one index content from ES
-    and stores it into a file for upload
+    Stream one index content from Elasticsearch and store it into a file for upload.
     '''
     result = await _get_logs_from_elasticsearch(index_name)
 
@@ -138,10 +136,11 @@ async def _generate_snapshot(index_name: str):
         ),
         LOGS_FILES_OPEN_METHOD,
     ) as logs_file:
-
+        # Write initial batch of logs
         for log in logs:
             logs_file.write(_get_log_to_string(log))
 
+        # Continue scrolling and writing logs until no more results
         while elasticsearch_logs_amount > 0:
             result = await _scroll_logs_from_elasticsearch(scroll_id)
 
@@ -159,17 +158,18 @@ def _handle_snapshot(
     index_name: str,
 ):
     '''
-    Uploads the dump for the given index into S3
-    and remove the logs file.
+    Uploads the dump for the given index into S3 and removes the local logs file.
     '''
     file_path = SNAPSHOTS_DIRECTORY + '/' + index_name
 
+    # Upload file to S3
     s3_transfer.upload_file(
         file_path,
         S3_BUCKET_NAME,
         index_name,
     )
 
+    # Remove local file after successful upload
     os.remove(file_path)
 
 
@@ -178,7 +178,7 @@ def _remove_index(
     index_name: str,
 ):
     '''
-    Removes the given index from elasticsearch.
+    Removes the given index from Elasticsearch.
 
     Args:
         es_client(elasticsearch.client.Elasticsearch)
@@ -192,9 +192,9 @@ def _remove_index(
 
 async def _run():
     '''
-    Main script.
+    Main asynchronous function to orchestrate the snapshot creation process.
     '''
-
+    # Initialize S3 client
     s3_client = boto3.client(
         's3',
         aws_access_key_id=AWS_ACCESS_KEY,
@@ -204,16 +204,22 @@ async def _run():
     )
     s3_transfer = S3Transfer(s3_client)
 
+    # Initialize Elasticsearch client
     es_client = Elasticsearch([ELASTICSEARCH_HOSTNAME])
 
+    # Get list of indices to process
     indices = _get_data_indices()
 
+    # Process each index
     for index in indices:
+        # Generate snapshot file
         await _generate_snapshot(index)
+        # Upload snapshot to S3
         _handle_snapshot(
             s3_transfer,
             index,
         )
+        # Remove index from Elasticsearch
         _remove_index(
             es_client,
             index,
@@ -222,7 +228,7 @@ async def _run():
 
 def main():
     '''
-    Script entry point.
+    Script entry point. Sets up and runs the asynchronous event loop.
     '''
     loop = asyncio.get_event_loop()
     loop.run_until_complete(_run())
