@@ -1,5 +1,8 @@
 '''
-Handles GET /logs requests.
+get_logs_handler.py
+
+This module handles GET requests to the /logs endpoint.
+It retrieves logs from ElasticSearch and S3 based on the specified date range and service ID.
 '''
 import json
 import async_timeout
@@ -31,6 +34,12 @@ def _get_log_to_string(log: Any) -> str:
     Returns a string representation of the given log.
     Convert single quotes to double quotes in order to match with JSON format
     (required for streaming)
+
+    Args:
+        log (Any): The log object to convert
+
+    Returns:
+        str: A string representation of the log
     '''
     return str(log['_source']).replace("'", '"')
 
@@ -42,6 +51,14 @@ async def _get_logs_from_elasticsearch(
 ) -> dict:
     '''
     Coroutine that returns the first page of logs from ES.
+
+    Args:
+        service_id (int): The ID of the service to fetch logs for
+        start_date (str): The start date of the log range
+        end_date (str): The end date of the log range
+
+    Returns:
+        dict: The Elasticsearch response containing the logs
     '''
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
@@ -83,6 +100,13 @@ async def _scroll_logs_from_elasticsearch(
 ) -> dict:
     '''
     Scroll the next page of found results from Elasticsearch.
+
+    Args:
+        service_id (int): The ID of the service to fetch logs for
+        scroll_id (str): The Elasticsearch scroll ID
+
+    Returns:
+        dict: The Elasticsearch response containing the next page of logs
     '''
     # TODO: #123 we use a new session for one request here;
     # if we try to use the same session as before,
@@ -110,6 +134,10 @@ def _stream_logs_chunk(
 ):
     '''
     Streams each log one by one to the client.
+
+    Args:
+        stream (aiohttp.web_response.StreamResponse): The response stream
+        logs (list): The list of logs to stream
     '''
     last_log_index = len(logs) - 1
 
@@ -128,6 +156,13 @@ async def get_logs(
 ):
     '''
     Sends back logs according to the given dates range and service.
+
+    Args:
+        request (web.Request): The incoming HTTP request
+        es_client (Elasticsearch): The Elasticsearch client
+
+    Returns:
+        web.StreamResponse: A streaming response containing the logs
     '''
     service_id = request.match_info.get('id')
     start_date = request.match_info.get('start')
@@ -161,6 +196,7 @@ async def get_logs(
     first_iteration = False if elasticsearch_logs_amount > 0 else True
     first_elasticsearch_scroll = True
 
+    # Stream logs from Elasticsearch
     while elasticsearch_logs_amount > 0:
 
         if not first_elasticsearch_scroll:
@@ -182,6 +218,7 @@ async def get_logs(
 
         first_elasticsearch_scroll = False
 
+    # Stream logs from S3 if necessary
     now = datetime.now()
     last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
     if start <= last_snapshot_date:
