@@ -1,4 +1,8 @@
 '''
+This module manages the configuration for the logs service.
+It loads environment variables for Elasticsearch, aiohttp, and S3 settings.
+The module also includes assertions to ensure all required variables are set,
+preventing the service from starting with incomplete configuration.
 Loads the configuration from the environment variable,
 prevents the service to start if the variable cannot be found
 '''

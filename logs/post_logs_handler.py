@@ -1,4 +1,7 @@
 '''
+This module handles POST /logs requests.
+It receives log data in JSON format and saves it into Elasticsearch.
+Each log is associated with a service ID and stored with a timestamp.
 Handles POST /logs requests.
 '''
 from datetime import datetime
