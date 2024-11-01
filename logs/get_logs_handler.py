@@ -5,6 +5,7 @@ import json
 import async_timeout
 from datetime import datetime, timedelta
 from typing import Any
+import os
 
 import botocore
 import aiobotocore
@@ -13,11 +14,6 @@ import aiohttp
 from aiohttp import web
 from elasticsearch import Elasticsearch
 
-from logs.config import S3_ENDPOINT
-from logs.config import S3_BUCKET_NAME
-from logs.config import ELASTICSEARCH_HOSTNAME
-from logs.config import ELASTICSEARCH_PORT
-
 API_DATE_FORMAT = '%Y-%m-%d-%H-%M-%S'
 ELASTICSEARCH_DATE_FORMAT = 'yyyy-MM-dd-HH-mm-ss'
 SNAPSHOT_DAYS_FROM_NOW = 10
@@ -25,6 +21,10 @@ ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS = 10
 ELASTICSEARCH_MAXIMUM_RESULTS_PER_PAGE = 10
 ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME = '1m'  # 1 minute
 
+S3_ENDPOINT = os.environ.get('S3_ENDPOINT', 'localhost')
+S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'default-bucket')
+ELASTICSEARCH_HOSTNAME = os.environ.get('ELASTICSEARCH_HOSTNAME', 'localhost')
+ELASTICSEARCH_PORT = int(os.environ.get('ELASTICSEARCH_PORT', 9200))
 
 def _get_log_to_string(log: Any) -> str:
     '''
@@ -84,10 +84,6 @@ async def _scroll_logs_from_elasticsearch(
     '''
     Scroll the next page of found results from Elasticsearch.
     '''
-    # TODO: #123 we use a new session for one request here;
-    # if we try to use the same session as before,
-    # then not all the logs are returned from ES;
-    # we have to investigate how to organize the session(s) here
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
             async with session.get(
