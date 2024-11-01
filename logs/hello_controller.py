@@ -1,10 +1,7 @@
-from flask import Flask
+from aiohttp import web
 
-app = Flask(__name__)
+async def hello_world(request):
+    return web.Response(text='Hello, world!')
 
-@app.route('/hello', methods=['GET'])
-def hello_world():
-    return 'Hello, world!'
-
-if __name__ == '__main__':
-    app.run(debug=True)
+def setup_routes(app):
+    app.router.add_get('/hello', hello_world)
