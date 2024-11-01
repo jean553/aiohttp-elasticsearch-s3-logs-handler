@@ -7,7 +7,6 @@ It provides functionality to:
 - Stream logs to the client in a paginated manner
 - Retrieve older logs from S3 if necessary
 - Combine and return logs from both Elasticsearch and S3
-
 The main function 'get_logs' serves as the request handler for the /logs endpoint.
 '''
 
