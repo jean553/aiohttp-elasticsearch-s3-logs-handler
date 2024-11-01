@@ -20,33 +20,33 @@ Four containers are included into the project:
 
 ## Create the service
 
-```bash
+bash
 vagrant up
-```
+
 
 ## Connect to the service
 
-```bash
+bash
 vagrant ssh
-```
+
 
 ## Starts the service
 
-```bash
+bash
 python -m "logs"
-```
+
 
 ## Tests
 
-```bash
+bash
 py.test
-```
+
 
 ## Loading tests
 
-```bash
+bash
 locust --host=http://localhost:8000
-```
+
 
 Connect to the web interface on port 8089.
 
@@ -54,43 +54,43 @@ This is better to run the Locust client on a separated machine.
 
 ## Pylint
 
-```bash
+bash
 pylint logs/
-```
+
 
 ## POST /logs
 
-```bash
+bash
 curl http://localhost:8000/api/1/service/1/logs \
     -X POST \
     -d '{"logs": [{"message": "log message", "level": "low", "category": "my category", "date": "1502304972"}]}' \
     -H 'Content-Type: application/json'
-```
+
 
 ## GET /logs
 
-```bash
+bash
 curl http://localhost:8000/api/1/service/1/logs/2017-10-15-20-00-00/2017-10-16-15-00-00
-```
+
 
 ## Connect to Kibana
 
 In your browser:
 
-```
-http://kibana-container-ip-address:5601
-```
 
-This IP address can be found using `docker inspect aiohttp-elasticsearch-s3-logs-handler_kibana`.
-The index pattern is `data-*`.
+http://kibana-container-ip-address:5601
+
+
+This IP address can be found using docker inspect aiohttp-elasticsearch-s3-logs-handler_kibana.
+The index pattern is data-*.
 
 ## Performance tests
 
 This test performs a lot of POST requests for many logs from many TSV files.
 
-```bash
+bash
 python tests/performance/performance_test.py
-```
+
 
 ## Launch service into AWS Cloud
 
@@ -98,59 +98,59 @@ python tests/performance/performance_test.py
 that are not part of the AWS Free tier.
 
 You must have an IAM user with the following permissions:
- * `AmazonEC2FullAccess`,
- * `AmazonS3FullAccess`
+ * AmazonEC2FullAccess,
+ * AmazonS3FullAccess
 
 Furthermore, you have to create a key pair file,
-and using the name as `key_name` below.
+and using the name as key_name below.
 
 ### Create the required AMIs with Packer
 
 Packer must be installed on your machine
 (https://www.packer.io/downloads.html).
 
-The following commands have to be executed into the `build_scripts/` folder.
+The following commands have to be executed into the build_scripts/ folder.
 They build the following AMIs:
  * backend,
  * elasticsearch,
  * kibana,
  * worker
 
-```bash
+bash
 packer build \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
     packer_backend.json
-```
 
-```bash
+
+bash
 packer build \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
     packer_es.json
-```
 
-```bash
+
+bash
 packer build \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
     packer_kibana.json
-```
 
-```bash
+
+bash
 packer build \
     -var 'access_key=ACCESS_KEY' \
     -var 'secret_key=SECRET_KEY' \
     -var 'region=REGION' \
     packer_worker.json
-```
+
 
 ### Create the infrastructure with Terraform
 
-```bash
+bash
 terraform init
 
 terraform plan \
@@ -172,17 +172,17 @@ terraform apply \
     -var 'kibana_ami_id=KIBANA_AMI_ID' \
     -var 'worker_ami_id=WORKER_AMI_ID' \
     -var 'key_name=SSH_KEY_NAME'
-```
+
 
 ### Allow the worker to upload into S3
 
 Connect using SSH to the worker machine:
 
-```bash
+bash
 ssh admin@worker-elastic-ip -i key.pem
-```
 
-Edit the file `/etc/cron.d/snapshot` and set the AWS credentials.
+
+Edit the file /etc/cron.d/snapshot and set the AWS credentials.
 Cron does not need to be restarted.
 
 ## Credits
