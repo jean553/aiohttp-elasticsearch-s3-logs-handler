@@ -98,16 +98,6 @@ async def _scroll_logs_from_elasticsearch(
     service_id: int,
     scroll_id: str,
 ) -> dict:
-    '''
-    Scroll the next page of found results from Elasticsearch.
-
-    Args:
-        service_id (int): The ID of the service to fetch logs for
-        scroll_id (str): The Elasticsearch scroll ID
-
-    Returns:
-        dict: The Elasticsearch response containing the next page of logs
-    '''
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
             async with session.get(
