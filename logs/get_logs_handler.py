@@ -1,6 +1,16 @@
 '''
-Handles GET /logs requests.
+get_logs_handler.py
+
+This module handles GET requests for retrieving logs from Elasticsearch and S3.
+It provides functionality to:
+- Fetch logs from Elasticsearch based on service ID and date range
+- Stream logs to the client in a paginated manner
+- Retrieve older logs from S3 if necessary
+- Combine and return logs from both Elasticsearch and S3
+
+The main function 'get_logs' serves as the request handler for the /logs endpoint.
 '''
+
 import json
 import async_timeout
 from datetime import datetime, timedelta
