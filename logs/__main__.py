@@ -1,5 +1,14 @@
 '''
-Starts the service.
+Logs Main Module
+
+This module is the entry point for the Logs. It sets up the web application,
+configures routes for handling log operations, and starts the service.
+
+The service provides two main endpoints:
+1. POST /api/1/service/{id}/logs - for posting new logs
+2. GET /api/1/service/{id}/logs/{start}/{end} - for retrieving logs within a time range
+
+The service uses Elasticsearch as its backend for storing and retrieving logs.
 '''
 
 from functools import partial
