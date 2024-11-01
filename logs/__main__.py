@@ -1,7 +1,7 @@
 '''
-Logs Service Main Module
+Logs Main Module
 
-This module is the entry point for the Logs Service. It sets up the web application,
+This module is the entry point for the Logs. It sets up the web application,
 configures routes for handling log operations, and starts the service.
 
 The service provides two main endpoints:
