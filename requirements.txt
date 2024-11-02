@@ -10,4 +10,5 @@ locustio
 
 # for tests
 pytest
+pytest-aiohttp
 requests
