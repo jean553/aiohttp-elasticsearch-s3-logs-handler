@@ -1,3 +1,4 @@
+# hello world
 '''
 Handles GET /logs requests.
 '''
@@ -126,7 +127,6 @@ async def get_logs(
     request: web.Request,
     es_client: Elasticsearch,
 ):
-    # hello world
     '''
     Sends back logs according to the given dates range and service.
     '''
