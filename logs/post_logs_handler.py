@@ -1,5 +1,15 @@
 '''
 Handles POST /logs requests.
+
+This module provides functionality to save logs for a specific service
+into Elasticsearch. It processes incoming log data in JSON format,
+prepares it for Elasticsearch indexing, and performs bulk insertion.
+
+Key features:
+- Accepts logs in JSON format
+- Processes and transforms log data for Elasticsearch
+- Creates daily indices in Elasticsearch
+- Performs bulk insertion for efficient log storage
 '''
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers

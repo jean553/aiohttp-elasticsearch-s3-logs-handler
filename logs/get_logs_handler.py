@@ -1,5 +1,16 @@
 '''
 Handles GET /logs requests.
+
+This module provides functionality to retrieve logs for a specific service
+within a given date range. It fetches logs from Elasticsearch and S3,
+combining them into a single stream response. The logs are returned
+in JSON format, with each log entry streamed individually to the client.
+
+Key features:
+- Fetches logs from Elasticsearch for recent data
+- Retrieves older logs from S3 snapshots
+- Supports pagination through Elasticsearch scrolling
+- Streams logs to the client for efficient memory usage
 '''
 import json
 import async_timeout
