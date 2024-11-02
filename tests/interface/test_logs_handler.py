@@ -4,11 +4,15 @@ Tests for POST logs
 import os
 import time
 from datetime import datetime
+from unittest.mock import Mock, patch
 
 import requests
+import pytest
+from aiohttp import web
 
 from elasticsearch import Elasticsearch, helpers
 
+from logs.post_logs_handler import post_logs
 from elasticsearch_client import remove_all_data_indices
 
 BASE_URL = 'http://localhost:8000/api/1/service/1'
@@ -213,3 +217,70 @@ def test_post_two_logs_at_two_different_days():
     logs_amount = result['hits']['total']
     assert logs_amount == 1, \
         'unexpected logs amount, got %s, expected 1' % logs_amount
+
+@pytest.mark.asyncio
+async def test_post_logs_success():
+    mock_request = Mock(spec=web.Request)
+    mock_request.json.return_value = {
+        'logs': [
+            {
+                'message': 'test log',
+                'level': 'info',
+                'category': 'test',
+                'date': '1617183600'
+            }
+        ]
+    }
+    mock_request.match_info = {'id': '1'}
+
+    mock_es_client = Mock(spec=Elasticsearch)
+    
+    with patch('elasticsearch.helpers.bulk') as mock_bulk:
+        response = await post_logs(mock_request, mock_es_client)
+    
+    assert isinstance(response, web.Response)
+    assert response.status == 200
+    mock_bulk.assert_called_once()
+
+@pytest.mark.asyncio
+async def test_post_logs_empty():
+    mock_request = Mock(spec=web.Request)
+    mock_request.json.return_value = {'logs': []}
+    mock_request.match_info = {'id': '1'}
+
+    mock_es_client = Mock(spec=Elasticsearch)
+    
+    with patch('elasticsearch.helpers.bulk') as mock_bulk:
+        response = await post_logs(mock_request, mock_es_client)
+    
+    assert isinstance(response, web.Response)
+    assert response.status == 200
+    mock_bulk.assert_not_called()
+
+@pytest.mark.asyncio
+async def test_post_logs_invalid_json():
+    mock_request = Mock(spec=web.Request)
+    mock_request.json.side_effect = ValueError("Invalid JSON")
+    mock_request.match_info = {'id': '1'}
+
+    mock_es_client = Mock(spec=Elasticsearch)
+    
+    with pytest.raises(ValueError):
+        await post_logs(mock_request, mock_es_client)
+
+@pytest.mark.asyncio
+async def test_post_logs_elasticsearch_error():
+    mock_request = Mock(spec=web.Request)
+    mock_request.json.return_value = {
+        'logs': [
+            {
+                'message': 'test log',
+                'level': 'info',
+                'category': 'test',
+                'date': '1617183600'
+            }
+        ]
+    }
+    mock_request.match_info = {'id': '1'}
+
+    mock_es_client = Mock(spec=Elasticsearch)
