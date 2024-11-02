@@ -126,6 +126,7 @@ async def get_logs(
     request: web.Request,
     es_client: Elasticsearch,
 ):
+    # hello
     '''
     Sends back logs according to the given dates range and service.
     '''
