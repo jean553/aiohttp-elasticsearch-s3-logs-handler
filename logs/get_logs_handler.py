@@ -1,3 +1,4 @@
+# hello world
 '''
 Handles GET /logs requests.
 '''
