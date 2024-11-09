@@ -127,6 +127,12 @@ async def get_logs(
     es_client: Elasticsearch,
 ):
     '''
+    Main handler for GET /logs requests.
+    Retrieves logs from Elasticsearch and S3 based on the provided service ID and date range.
+    Streams the logs back to the client in JSON format.
+    '''
+
+    '''
     Sends back logs according to the given dates range and service.
     '''
     service_id = request.match_info.get('id')
@@ -143,6 +149,7 @@ async def get_logs(
         API_DATE_FORMAT,
     )
 
+    # Fetch the first page of logs from Elasticsearch
     result = await _get_logs_from_elasticsearch(
         service_id,
         start_date,
@@ -161,6 +168,7 @@ async def get_logs(
     first_iteration = False if elasticsearch_logs_amount > 0 else True
     first_elasticsearch_scroll = True
 
+    # Stream logs from Elasticsearch using scroll API
     while elasticsearch_logs_amount > 0:
 
         if not first_elasticsearch_scroll:
@@ -182,6 +190,7 @@ async def get_logs(
 
         first_elasticsearch_scroll = False
 
+    # Check if we need to fetch logs from S3 (for older data)
     now = datetime.now()
     last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
     if start <= last_snapshot_date:
@@ -197,6 +206,7 @@ async def get_logs(
             endpoint_url='http://' + S3_ENDPOINT,
         )
 
+        # Iterate through S3 indices and fetch relevant logs
         while s3_index_date <= last_snapshot_date:
 
             s3_index = 'data-%s-%04d-%02d-%02d' % (
@@ -221,6 +231,7 @@ async def get_logs(
             s3_stream = s3_response['Body']
             s3_line = await s3_stream.readline()
 
+            # Process each log line from S3
             while(len(s3_line) > 0):
 
                 temp_line = s3_line.decode('utf-8')
@@ -247,6 +258,7 @@ async def get_logs(
             s3_stream.close()
         s3_client.close()
 
+    # Finalize the JSON response
     stream.write(b']}')
 
     return stream
