@@ -129,10 +129,12 @@ async def get_logs(
     '''
     Sends back logs according to the given dates range and service.
     '''
+    # Extract parameters from the request
     service_id = request.match_info.get('id')
     start_date = request.match_info.get('start')
     end_date = request.match_info.get('end')
 
+    # Convert start and end dates to datetime objects
     start = datetime.strptime(
         start_date,
         API_DATE_FORMAT,
@@ -143,12 +145,14 @@ async def get_logs(
         API_DATE_FORMAT,
     )
 
+    # Get the first page of logs from Elasticsearch
     result = await _get_logs_from_elasticsearch(
         service_id,
         start_date,
         end_date,
     )
 
+    # Prepare the streaming response
     stream = web.StreamResponse()
     stream.content_type = 'application/json'
     await stream.prepare(request)
@@ -161,8 +165,8 @@ async def get_logs(
     first_iteration = False if elasticsearch_logs_amount > 0 else True
     first_elasticsearch_scroll = True
 
+    # Stream logs from Elasticsearch
     while elasticsearch_logs_amount > 0:
-
         if not first_elasticsearch_scroll:
             stream.write(b',')
 
@@ -171,6 +175,7 @@ async def get_logs(
             logs,
         )
 
+        # Get the next page of logs
         result = await _scroll_logs_from_elasticsearch(
             service_id,
             scroll_id,
@@ -182,12 +187,13 @@ async def get_logs(
 
         first_elasticsearch_scroll = False
 
+    # Check if we need to fetch logs from S3
     now = datetime.now()
     last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
     if start <= last_snapshot_date:
-
         s3_index_date = start
 
+        # Initialize S3 client
         s3_session = aiobotocore.get_session()
         s3_client = s3_session.create_client(
             service_name='s3',
@@ -197,8 +203,8 @@ async def get_logs(
             endpoint_url='http://' + S3_ENDPOINT,
         )
 
+        # Fetch logs from S3 for each day
         while s3_index_date <= last_snapshot_date:
-
             s3_index = 'data-%s-%04d-%02d-%02d' % (
                 service_id,
                 s3_index_date.year,
@@ -211,18 +217,20 @@ async def get_logs(
             s3_response = None
 
             try:
+                # Try to get the object from S3
                 s3_response = await s3_client.get_object(
                     Bucket=S3_BUCKET_NAME,
                     Key=s3_index,
                 )
             except botocore.exceptions.ClientError:
+                # If the object doesn't exist, continue to the next day
                 continue
 
             s3_stream = s3_response['Body']
             s3_line = await s3_stream.readline()
 
+            # Process each line in the S3 object
             while(len(s3_line) > 0):
-
                 temp_line = s3_line.decode('utf-8')
                 line_items = json.loads(temp_line)
                 log_date = datetime.strptime(
@@ -230,6 +238,7 @@ async def get_logs(
                     '%Y-%m-%dT%H:%M:%S',
                 )
 
+                # Check if the log is within the requested date range
                 if log_date < start or log_date > end:
                     s3_line = await s3_stream.readline()
                     continue
@@ -247,6 +256,7 @@ async def get_logs(
             s3_stream.close()
         s3_client.close()
 
+    # Close the JSON array and return the stream
     stream.write(b']}')
 
     return stream
