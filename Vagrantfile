@@ -1,11 +1,13 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby ts=2 sw=2 expandtab :
 
+# Project configuration
 PROJECT = "aiohttp-elasticsearch-s3-logs-handler"
 ENV["VAGRANT_NO_PARALLEL"] = "yes"
 ENV["VAGRANT_DEFAULT_PROVIDER"] = "docker"
 VAGRANTFILE_VERSION = "2"
 S3_BUCKET_NAME = "aiohttp-elasticsearch-s3-logs-handler"
+# S3 and AioHTTP configuration
 S3_ENDPOINT = "s3:5000"
 AIOHTTP_PORT = 8000
 
@@ -15,6 +17,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     # used for 'dev' containers to have same permissions as current user
     "HOST_USER_UID" => Process.euid,
 
+    # Environment and application configuration
     "ENV_NAME" => "devdocker",
     "APP_PATH" => "/vagrant",
     "VIRTUAL_ENV_PATH" => "/tmp/virtual_env35",
@@ -23,7 +26,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     "ELASTICSEARCH_PORT" => 9200,
     "AIOHTTP_PORT" => AIOHTTP_PORT,
 
-    # add your credentials here
+    # AWS and S3 configuration (using dummy values for development)
     "AWS_ACCESS_KEY" => "dummy",
     "AWS_SECRET_KEY" => "dummy",
     "REGION_NAME" => "dummy",
@@ -31,6 +34,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     "S3_ENDPOINT" => S3_ENDPOINT
   }
 
+  # S3 container configuration
   config.vm.define "s3" do |s3|
     s3.vm.provider "docker" do |d|
       d.image = "jean553/docker-s3-server-dev"
@@ -38,6 +42,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     end
   end
 
+  # Elasticsearch container configuration
   config.vm.define "elasticsearch" do |app|
     app.vm.provider "docker" do |d|
       d.image = "docker.elastic.co/elasticsearch/elasticsearch:5.4.3"
@@ -54,6 +59,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     end
   end
 
+  # Kibana container configuration (part of the ELK stack)
   config.vm.define "kibana" do |app|
     app.vm.provider "docker" do |d|
       d.image = "docker.elastic.co/kibana/kibana:5.4.3"
@@ -67,6 +73,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
   end
 
   config.ssh.insert_key = true
+  # Development environment container configuration
   config.vm.define "dev", primary: true do |app|
     app.vm.provider "docker" do |d|
       d.image = "allansimon/allan-docker-dev-python"
@@ -78,6 +85,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     end
     app.ssh.username = "vagrant"
 
+    # Ansible provisioning for development environment
     app.vm.provision "ansible", type: "shell" do |ansible|
       ansible.env = environment_variables
       ansible.inline = "
