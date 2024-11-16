@@ -1,5 +1,9 @@
 '''
-Handles POST /logs requests.
+Post Logs Handler
+
+This module handles POST requests to /logs endpoint.
+It receives log data, processes it, and saves it into ElasticSearch.
+The handler supports bulk log insertion for efficient data storage.
 '''
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers

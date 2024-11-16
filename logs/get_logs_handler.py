@@ -1,5 +1,11 @@
 '''
-Handles GET /logs requests.
+Get Logs Handler
+
+This module handles GET requests to /logs endpoint.
+It retrieves logs based on service ID, start date, and end date.
+The handler supports pagination through Elasticsearch scrolling
+and can fetch older logs from S3 storage.
+Logs are streamed back to the client in JSON format.
 '''
 import json
 import async_timeout
