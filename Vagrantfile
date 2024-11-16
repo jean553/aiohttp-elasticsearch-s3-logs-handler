@@ -59,7 +59,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     end
   end
 
-  # Kibana container configuration
+  # Kibana container configuration (part of the ELK stack)
   config.vm.define "kibana" do |app|
     app.vm.provider "docker" do |d|
       d.image = "docker.elastic.co/kibana/kibana:5.4.3"
