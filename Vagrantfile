@@ -91,7 +91,6 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
       d.env = environment_variables
     end
     app.ssh.username = "vagrant"
-
     # Set up Ansible provisioning for the development environment
     # Ansible provisioning for development environment
     app.vm.provision "ansible", type: "shell" do |ansible|
