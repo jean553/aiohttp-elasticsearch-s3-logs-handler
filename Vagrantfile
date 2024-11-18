@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby ts=2 sw=2 expandtab :
 
+# Define project-specific constants and environment variables
 # Project configuration
 PROJECT = "aiohttp-elasticsearch-s3-logs-handler"
 ENV["VAGRANT_NO_PARALLEL"] = "yes"
@@ -11,8 +12,10 @@ S3_BUCKET_NAME = "aiohttp-elasticsearch-s3-logs-handler"
 S3_ENDPOINT = "s3:5000"
 AIOHTTP_PORT = 8000
 
+# Begin Vagrant configuration
 Vagrant.configure(VAGRANTFILE_VERSION) do |config|
 
+  # Set up environment variables for containers
   environment_variables = {
     # used for 'dev' containers to have same permissions as current user
     "HOST_USER_UID" => Process.euid,
@@ -34,6 +37,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     "S3_ENDPOINT" => S3_ENDPOINT
   }
 
+  # Define and configure the S3 container
   # S3 container configuration
   config.vm.define "s3" do |s3|
     s3.vm.provider "docker" do |d|
@@ -42,6 +46,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     end
   end
 
+  # Define and configure the Elasticsearch container
   # Elasticsearch container configuration
   config.vm.define "elasticsearch" do |app|
     app.vm.provider "docker" do |d|
@@ -59,6 +64,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     end
   end
 
+  # Define and configure the Kibana container
   # Kibana container configuration (part of the ELK stack)
   config.vm.define "kibana" do |app|
     app.vm.provider "docker" do |d|
@@ -73,6 +79,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
   end
 
   config.ssh.insert_key = true
+  # Define and configure the development environment container
   # Development environment container configuration
   config.vm.define "dev", primary: true do |app|
     app.vm.provider "docker" do |d|
@@ -85,6 +92,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     end
     app.ssh.username = "vagrant"
 
+    # Set up Ansible provisioning for the development environment
     # Ansible provisioning for development environment
     app.vm.provision "ansible", type: "shell" do |ansible|
       ansible.env = environment_variables
