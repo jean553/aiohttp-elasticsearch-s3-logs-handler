@@ -1,5 +1,6 @@
 '''
 Handles POST /logs requests.
+This module contains the handler for posting logs to ElasticSearch.
 '''
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
@@ -11,6 +12,11 @@ async def post_logs(
     request: web.Request,
     es_client: Elasticsearch,
 ):
+    '''
+    Handler for POST /logs/{id} endpoint.
+    Receives logs from a service and saves them into ElasticSearch.
+    '''
+
     '''
     Save sent logs into ElasticSearch.
     '''

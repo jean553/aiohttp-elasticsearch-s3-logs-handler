@@ -1,5 +1,6 @@
 '''
 Handles GET /logs requests.
+This module contains the handler for retrieving logs from ElasticSearch and S3.
 '''
 import json
 import async_timeout
@@ -126,6 +127,12 @@ async def get_logs(
     request: web.Request,
     es_client: Elasticsearch,
 ):
+    '''
+    Handler for GET /logs/{id}/{start}/{end} endpoint.
+    Retrieves logs for a specific service within a given date range.
+    Fetches logs from ElasticSearch and, if necessary, from S3 for older data.
+    '''
+
     '''
     Sends back logs according to the given dates range and service.
     '''
