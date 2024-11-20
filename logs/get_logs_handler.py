@@ -27,13 +27,13 @@ ELASTICSEARCH_MAXIMUM_RESULTS_PER_PAGE = 10
 ELASTICSEARCH_SEARCH_CONTEXT_LIFETIME = '1m'  # 1 minute
 
 
-def _get_log_to_string(log: Any) -> str:
+def _get_log_to_string(log_entry: Any) -> str:
     '''
     Returns a string representation of the given log.
     Convert single quotes to double quotes in order to match with JSON format
     (required for streaming)
     '''
-    return str(log['_source']).replace("'", '"')
+    return str(log_entry['_source']).replace("'", '"')
 
 
 async def _get_logs_from_elasticsearch(
@@ -114,13 +114,13 @@ def _stream_logs_chunk(
     '''
     last_log_index = len(logs) - 1
 
-    for counter, log in enumerate(logs):
-        line = _get_log_to_string(log)
+    for log_index, log_entry in enumerate(logs):
+        log_line = _get_log_to_string(log_entry)
 
-        if counter != last_log_index:
-            line += ','
+        if log_index != last_log_index:
+            log_line += ','
 
-        stream.write(line.encode())
+        stream.write(log_line.encode())
 
 
 async def get_logs(
@@ -137,63 +137,63 @@ async def get_logs(
     Sends back logs according to the given dates range and service.
     '''
     service_id = request.match_info.get('id')
-    start_date = request.match_info.get('start')
-    end_date = request.match_info.get('end')
+    start_date_str = request.match_info.get('start')
+    end_date_str = request.match_info.get('end')
 
-    start = datetime.strptime(
-        start_date,
+    start_datetime = datetime.strptime(
+        start_date_str,
         API_DATE_FORMAT,
     )
 
-    end = datetime.strptime(
-        end_date,
+    end_datetime = datetime.strptime(
+        end_date_str,
         API_DATE_FORMAT,
     )
 
-    result = await _get_logs_from_elasticsearch(
+    elasticsearch_result = await _get_logs_from_elasticsearch(
         service_id,
-        start_date,
-        end_date,
+        start_date_str,
+        end_date_str,
     )
 
-    stream = web.StreamResponse()
-    stream.content_type = 'application/json'
-    await stream.prepare(request)
-    stream.write(b'{"logs": [')
+    response_stream = web.StreamResponse()
+    response_stream.content_type = 'application/json'
+    await response_stream.prepare(request)
+    response_stream.write(b'{"logs": [')
 
-    scroll_id = result['_scroll_id']
-    logs = result['hits']['hits']
-    elasticsearch_logs_amount = len(logs)
+    scroll_id = elasticsearch_result['_scroll_id']
+    elasticsearch_logs = elasticsearch_result['hits']['hits']
+    elasticsearch_logs_count = len(elasticsearch_logs)
 
-    first_iteration = False if elasticsearch_logs_amount > 0 else True
+    first_iteration = elasticsearch_logs_count == 0
     first_elasticsearch_scroll = True
 
-    while elasticsearch_logs_amount > 0:
+    while elasticsearch_logs_count > 0:
 
         if not first_elasticsearch_scroll:
-            stream.write(b',')
+            response_stream.write(b',')
 
         _stream_logs_chunk(
-            stream,
-            logs,
+            response_stream,
+            elasticsearch_logs,
         )
 
-        result = await _scroll_logs_from_elasticsearch(
+        elasticsearch_result = await _scroll_logs_from_elasticsearch(
             service_id,
             scroll_id,
         )
 
-        scroll_id = result['_scroll_id']
-        logs = result['hits']['hits']
-        elasticsearch_logs_amount = len(logs)
+        scroll_id = elasticsearch_result['_scroll_id']
+        elasticsearch_logs = elasticsearch_result['hits']['hits']
+        elasticsearch_logs_count = len(elasticsearch_logs)
 
         first_elasticsearch_scroll = False
 
-    now = datetime.now()
-    last_snapshot_date = now - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
-    if start <= last_snapshot_date:
+    current_datetime = datetime.now()
+    last_snapshot_date = current_datetime - timedelta(days=SNAPSHOT_DAYS_FROM_NOW)
+    if start_datetime <= last_snapshot_date:
 
-        s3_index_date = start
+        s3_index_date = start_datetime
 
         s3_session = aiobotocore.get_session()
         s3_client = s3_session.create_client(
@@ -230,30 +230,30 @@ async def get_logs(
 
             while(len(s3_line) > 0):
 
-                temp_line = s3_line.decode('utf-8')
-                line_items = json.loads(temp_line)
-                log_date = datetime.strptime(
-                    line_items['date'],
+                s3_line_decoded = s3_line.decode('utf-8')
+                s3_log_entry = json.loads(s3_line_decoded)
+                log_datetime = datetime.strptime(
+                    s3_log_entry['date'],
                     '%Y-%m-%dT%H:%M:%S',
                 )
 
-                if log_date < start or log_date > end:
+                if log_datetime < start_datetime or log_datetime > end_datetime:
                     s3_line = await s3_stream.readline()
                     continue
 
-                line = str(line_items).replace("'", '"')
+                log_line = str(s3_log_entry).replace("'", '"')
 
                 if not first_iteration:
-                    line = ',' + line
+                    log_line = ',' + log_line
                 first_iteration = False
 
-                stream.write(line.encode())
+                response_stream.write(log_line.encode())
 
                 s3_line = await s3_stream.readline()
 
             s3_stream.close()
         s3_client.close()
 
-    stream.write(b']}')
+    response_stream.write(b']}')
 
-    return stream
+    return response_stream
