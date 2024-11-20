@@ -1,4 +1,5 @@
 {
+    "__comment": "This Packer script creates an AMI for the worker, setting up the necessary environment and configurations.",
     "variables": {
         "access_key": "",
         "secret_key": "",

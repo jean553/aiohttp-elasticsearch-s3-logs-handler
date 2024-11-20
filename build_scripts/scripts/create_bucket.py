@@ -1,5 +1,6 @@
 #!/usr/bin/python
 '''
+This script creates a dummy S3 bucket in the fake S3 service for development purposes.
 Creates a dummy bucket inside the S3 fake service.
 '''
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+# This script creates an Elasticsearch index template for data indices
 curl -XPUT 'http://elasticsearch:9200/_template/data-template?pretty' -d '
 {
   "template": "data-*",

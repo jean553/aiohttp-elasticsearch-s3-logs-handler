@@ -1,4 +1,5 @@
 ---
+# This Ansible playbook sets up the Elasticsearch environment, installing and configuring Elasticsearch
 - hosts: localhost
   become: yes
 
