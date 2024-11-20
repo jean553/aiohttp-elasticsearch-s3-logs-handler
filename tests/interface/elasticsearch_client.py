@@ -1,4 +1,6 @@
 '''
+This file contains utility functions for interacting with Elasticsearch
+in the context of testing the logs service.
 Elasticsearch client routines for tests
 '''
 

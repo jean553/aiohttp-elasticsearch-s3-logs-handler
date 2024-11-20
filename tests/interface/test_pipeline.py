@@ -1,4 +1,7 @@
 '''
+This file contains end-to-end tests for the entire logs pipeline.
+It tests the flow of logs from insertion, through Elasticsearch,
+to S3 storage, and back to retrieval.
 Functionnal test that checks that:
  - log is inserted into the index after a POST
  - log is got from the elasticsearch index after GET
