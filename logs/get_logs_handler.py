@@ -1,5 +1,16 @@
 '''
 Handles GET /logs requests.
+
+This module provides functionality to retrieve logs from Elasticsearch and S3 based on
+specified date ranges and service IDs. It supports pagination through Elasticsearch
+scroll API and handles fetching older logs from S3 snapshots.
+
+Key features:
+- Retrieves logs from Elasticsearch for recent data
+- Fetches older logs from S3 snapshots
+- Supports date range filtering
+- Implements pagination using Elasticsearch scroll API
+- Streams logs to the client for efficient memory usage
 '''
 import json
 import async_timeout
