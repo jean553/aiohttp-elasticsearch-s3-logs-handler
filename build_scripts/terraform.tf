@@ -1,3 +1,4 @@
+# Terraform configuration for setting up the AWS infrastructure
 variable "access_key" {}
 variable "secret_key" {}
 variable "region" {}

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 '''
+This script creates snapshots of Elasticsearch indices and uploads them to S3.
 Creates a snapshot of for one index.
 '''
 import os

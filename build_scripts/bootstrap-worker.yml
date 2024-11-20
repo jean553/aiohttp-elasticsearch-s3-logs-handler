@@ -1,4 +1,5 @@
 ---
+# This Ansible playbook sets up the worker environment, installing dependencies and configuring the worker tasks
 - hosts: localhost
   become: yes
 
