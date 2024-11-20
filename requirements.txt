@@ -1,4 +1,3 @@
-# Main dependencies
 elasticsearch  # Elasticsearch client for Python
 boto3  # AWS SDK for Python
 aiobotocore  # Asynchronous version of boto3
