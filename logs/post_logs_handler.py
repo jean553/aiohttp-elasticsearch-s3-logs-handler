@@ -1,5 +1,24 @@
 '''
 Handles POST /logs requests.
+
+This handler accepts logs from a service and saves them into ElasticSearch.
+
+Request format:
+{
+    "logs": [
+        {
+            "date": "timestamp",
+            "level": "log_level",
+            "message": "log_message"
+            // ... other log fields
+        },
+        // ... more log entries
+    ]
+}
+
+Response:
+- 200 OK if logs are successfully saved
+- 400 Bad Request if the request format is invalid
 '''
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers

@@ -1,5 +1,28 @@
 '''
 Handles GET /logs requests.
+
+This handler retrieves logs for a specific service within a given date range.
+It fetches logs from both ElasticSearch and S3, combining the results.
+
+Request format:
+GET /logs/{service_id}/{start_date}/{end_date}
+
+Where:
+- service_id: ID of the service to fetch logs for
+- start_date: Start of the date range in format YYYY-MM-DD-HH-MM-SS
+- end_date: End of the date range in format YYYY-MM-DD-HH-MM-SS
+
+Response:
+Streams a JSON response with the following format:
+{
+    "logs": [
+        {log_entry_1},
+        {log_entry_2},
+        ...
+    ]
+}
+
+Each log entry is a JSON object containing log details.
 '''
 import json
 import async_timeout
