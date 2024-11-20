@@ -3,6 +3,7 @@ Starts the service.
 '''
 
 from functools import partial
+import psutil
 from aiohttp import web
 from elasticsearch import Elasticsearch
 
@@ -11,6 +12,19 @@ from logs.get_logs_handler import get_logs
 
 from logs.config import ELASTICSEARCH_HOSTNAME
 from logs.config import AIOHTTP_PORT
+
+
+async def get_server_metadata(request):
+    '''
+    Returns metadata about the server.
+    '''
+    metadata = {
+        'cpu_count': psutil.cpu_count(),
+        'memory_total': psutil.virtual_memory().total,
+        'disk_usage': psutil.disk_usage('/').percent,
+        'python_version': psutil.python_version(),
+    }
+    return web.json_response(metadata)
 
 
 def main():
@@ -36,6 +50,8 @@ def main():
             es_client=es_client,
         )
     )
+
+    app.router.add_get('/api/1/metadata', get_server_metadata)
 
     web.run_app(
         app,
