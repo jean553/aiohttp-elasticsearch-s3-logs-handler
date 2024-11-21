@@ -1,6 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby ts=2 sw=2 expandtab :
 
+# Vagrantfile for aiohttp-elasticsearch-s3-logs-handler project
+# This file defines the development environment using Docker containers
+
 # Project configuration
 PROJECT = "aiohttp-elasticsearch-s3-logs-handler"
 ENV["VAGRANT_NO_PARALLEL"] = "yes"
@@ -12,6 +15,7 @@ S3_ENDPOINT = "s3:5000"
 AIOHTTP_PORT = 8000
 
 Vagrant.configure(VAGRANTFILE_VERSION) do |config|
+  # Environment variables shared across containers
 
   environment_variables = {
     # used for 'dev' containers to have same permissions as current user
@@ -35,6 +39,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
   }
 
   # S3 container configuration
+  # Uses a custom Docker image for S3 server simulation
   config.vm.define "s3" do |s3|
     s3.vm.provider "docker" do |d|
       d.image = "jean553/docker-s3-server-dev"
@@ -43,6 +48,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
   end
 
   # Elasticsearch container configuration
+  # Uses official Elasticsearch Docker image with custom settings
   config.vm.define "elasticsearch" do |app|
     app.vm.provider "docker" do |d|
       d.image = "docker.elastic.co/elasticsearch/elasticsearch:5.4.3"
@@ -60,6 +66,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
   end
 
   # Kibana container configuration (part of the ELK stack)
+  # Uses official Kibana Docker image linked to Elasticsearch
   config.vm.define "kibana" do |app|
     app.vm.provider "docker" do |d|
       d.image = "docker.elastic.co/kibana/kibana:5.4.3"
@@ -74,6 +81,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
 
   config.ssh.insert_key = true
   # Development environment container configuration
+  # Uses a custom Python development image with SSH access
   config.vm.define "dev", primary: true do |app|
     app.vm.provider "docker" do |d|
       d.image = "allansimon/allan-docker-dev-python"
@@ -85,6 +93,7 @@ Vagrant.configure(VAGRANTFILE_VERSION) do |config|
     end
     app.ssh.username = "vagrant"
 
+    # Ansible provisioning for setting up the development environment
     # Ansible provisioning for development environment
     app.vm.provision "ansible", type: "shell" do |ansible|
       ansible.env = environment_variables
