@@ -1,6 +1,13 @@
-'''
+"""
+Logs Service
+
+This module serves as the entry point for the logs service.
+It sets up an aiohttp web application with routes for posting and retrieving logs.
+
+The service uses Elasticsearch as its backend for storing and querying logs.
+
 Starts the service.
-'''
+"""
 
 from functools import partial
 from aiohttp import web
