@@ -1,13 +1,13 @@
-elasticsearch
-boto3
-aiobotocore
-asyncio
-aiohttp
+elasticsearch  # Elasticsearch client for Python
+boto3  # AWS SDK for Python
+aiobotocore  # Asynchronous version of boto3
+asyncio  # Library for writing concurrent code using the async/await syntax
+aiohttp  # Asynchronous HTTP client/server framework for asyncio
 
-# for dev
-pylint
-locustio
+# Development dependencies
+pylint  # Python code linter for identifying and reporting on patterns in Python
+locustio  # Load testing tool for measuring system performance
 
-# for tests
-pytest
-requests
+# Testing dependencies
+pytest  # Testing framework for Python
+requests  # HTTP library for making requests in Python (used for testing)
