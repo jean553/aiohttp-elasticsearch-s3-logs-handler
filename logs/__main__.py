@@ -1,5 +1,15 @@
 '''
 Starts the service.
+
+This script initializes and runs the log service application.
+It sets up the Elasticsearch client and defines the API routes
+for posting and retrieving logs.
+
+The service exposes two endpoints:
+1. POST /api/1/service/{id}/logs - for posting logs
+2. GET /api/1/service/{id}/logs/{start}/{end} - for retrieving logs
+
+The application runs on the port specified in the AIOHTTP_PORT configuration.
 '''
 
 from functools import partial
