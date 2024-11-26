@@ -8,6 +8,7 @@ from elasticsearch import Elasticsearch
 
 from logs.post_logs_handler import post_logs
 from logs.get_logs_handler import get_logs
+from logs.hello_controller import setup_routes
 
 from logs.config import ELASTICSEARCH_HOSTNAME
 from logs.config import AIOHTTP_PORT
@@ -36,6 +37,9 @@ def main():
             es_client=es_client,
         )
     )
+
+    # Setup the hello world route
+    setup_routes(app)
 
     web.run_app(
         app,
