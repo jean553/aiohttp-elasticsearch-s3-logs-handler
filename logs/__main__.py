@@ -4,14 +4,10 @@ Starts the service.
 
 from functools import partial
 from aiohttp import web
-from elasticsearch import Elasticsearch
+import os
 
 from logs.post_logs_handler import post_logs
 from logs.get_logs_handler import get_logs
-
-from logs.config import ELASTICSEARCH_HOSTNAME
-from logs.config import AIOHTTP_PORT
-
 
 def main():
     '''
@@ -19,7 +15,7 @@ def main():
     '''
     app = web.Application()
 
-    es_client = Elasticsearch(hosts=[ELASTICSEARCH_HOSTNAME],)
+    es_client = Elasticsearch(hosts=[os.environ.get('ELASTICSEARCH_HOSTNAME', 'localhost')],)
 
     app.router.add_post(
         '/api/1/service/{id}/logs',
@@ -39,7 +35,7 @@ def main():
 
     web.run_app(
         app,
-        port=AIOHTTP_PORT,
+        port=int(os.environ.get('AIOHTTP_PORT', 8000)),
     )
 
 
