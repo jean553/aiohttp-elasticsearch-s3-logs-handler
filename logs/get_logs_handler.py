@@ -1,4 +1,7 @@
 '''
+This module handles GET /logs requests.
+It retrieves logs from Elasticsearch and S3 based on the given date range and service ID.
+The logs are then streamed back to the client in JSON format.
 Handles GET /logs requests.
 '''
 import json
