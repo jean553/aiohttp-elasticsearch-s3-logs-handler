@@ -11,6 +11,7 @@ async def post_logs(
     request: web.Request,
     es_client: Elasticsearch,
 ):
+    # this is a post request
     '''
     Save sent logs into ElasticSearch.
     '''
