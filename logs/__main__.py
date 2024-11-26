@@ -1,5 +1,8 @@
 '''
-Starts the service.
+__main__.py
+
+This module is the entry point for the logs service.
+It sets up the aiohttp web application and defines the routes.
 '''
 
 from functools import partial
@@ -16,11 +19,14 @@ from logs.config import AIOHTTP_PORT
 def main():
     '''
     Service starting function.
+    Sets up the aiohttp web application, configures routes, and starts the server.
     '''
     app = web.Application()
 
+    # Initialize Elasticsearch client
     es_client = Elasticsearch(hosts=[ELASTICSEARCH_HOSTNAME],)
 
+    # Configure routes
     app.router.add_post(
         '/api/1/service/{id}/logs',
         partial(
@@ -37,6 +43,7 @@ def main():
         )
     )
 
+    # Start the web server
     web.run_app(
         app,
         port=AIOHTTP_PORT,
