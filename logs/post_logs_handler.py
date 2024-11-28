@@ -8,7 +8,7 @@ from aiohttp import web
 
 
 async def post_logs(
-    request: web.Request,
+    request: web.Request, 
     es_client: Elasticsearch,
 ):
     '''
@@ -16,11 +16,16 @@ async def post_logs(
     '''
     data = await request.json()
     logs = data['logs']
-
+    
+    # Extract the service ID from the request URL
     service_id = request.match_info.get('id')
 
     for log in logs:
-
+        # Process each log entry
+        
+        # Generate the Elasticsearch index name based on the log date
+        # Format: data-{service_id}-YYYY-MM-DD
+        
         # TODO: #125 almost everytime, indices have the same day,
         # so this is superfluous to generate the index for each log;
         # we should find a better way to handle indices creations
@@ -28,6 +33,7 @@ async def post_logs(
         index = log_date.strftime('data-{}-%Y-%m-%d'.format(service_id))
 
         log.update(
+            # Add metadata to the log entry
             {
                 '_type': 'logs',
                 'service_id': service_id,
@@ -36,6 +42,7 @@ async def post_logs(
         log['_index'] = index
         log['date'] = log_date
 
+    # Bulk insert the processed logs into Elasticsearch
     helpers.bulk(
         es_client,
         logs,
