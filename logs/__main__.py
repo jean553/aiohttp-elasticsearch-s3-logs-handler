@@ -8,6 +8,7 @@ from elasticsearch import Elasticsearch
 
 from logs.post_logs_handler import post_logs
 from logs.get_logs_handler import get_logs
+from logs.put_handler import put_handler
 
 from logs.config import ELASTICSEARCH_HOSTNAME
 from logs.config import AIOHTTP_PORT
@@ -33,6 +34,14 @@ def main():
         '/api/1/service/{id}/logs/{start}/{end}',
         partial(
             get_logs,
+            es_client=es_client,
+        )
+    )
+
+    app.router.add_put(
+        '/api/1/service/{id}/{resource}',
+        partial(
+            put_handler,
             es_client=es_client,
         )
     )
