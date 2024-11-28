@@ -1,6 +1,12 @@
 '''
 Starts the service.
 '''
+=> This project implements an asynchronous non-blocking logs handler
+=> using Elasticsearch for short-term storage and Amazon S3 for long-term storage.
+=> It provides API endpoints to:
+=>  1. Post logs to Elasticsearch
+=>  2. Retrieve logs from Elasticsearch or S3 based on date range
+=> end of the comment
 
 from functools import partial
 from aiohttp import web
