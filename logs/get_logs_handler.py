@@ -1,6 +1,3 @@
-'''
-Handles GET /logs requests.
-'''
 import json
 import async_timeout
 from datetime import datetime, timedelta

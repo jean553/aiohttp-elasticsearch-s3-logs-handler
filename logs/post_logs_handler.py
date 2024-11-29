@@ -28,10 +28,6 @@ async def post_logs(
 
     for log in logs:
         # Generate the index name based on the log date and service ID
-
-        # TODO: #125 almost everytime, indices have the same day,
-        # so this is superfluous to generate the index for each log;
-        # we should find a better way to handle indices creations
         log_date = datetime.utcfromtimestamp(float(log['date']))
         index = log_date.strftime('data-{}-%Y-%m-%d'.format(service_id))
 
