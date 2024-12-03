@@ -11,9 +11,12 @@ async def post_logs(
     request: web.Request,
     es_client: Elasticsearch,
 ):
-    '''
-    Save sent logs into ElasticSearch.
-    '''
+    """
+    Handler for POST /logs requests.
+    
+    Receives logs from a client and saves them into Elasticsearch.
+    Each log is associated with a service ID and stored in a date-based index.
+    """
     data = await request.json()
     logs = data['logs']
 

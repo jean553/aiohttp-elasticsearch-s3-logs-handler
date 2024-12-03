@@ -126,9 +126,15 @@ async def get_logs(
     request: web.Request,
     es_client: Elasticsearch,
 ):
-    '''
+    """
+    Handler for GET /logs requests.
+    
+    Retrieves and streams logs for a specific service within a given date range.
+    Logs are fetched from Elasticsearch and S3, then streamed to the client
+    as a JSON response.
+    
     Sends back logs according to the given dates range and service.
-    '''
+    """
     service_id = request.match_info.get('id')
     start_date = request.match_info.get('start')
     end_date = request.match_info.get('end')
