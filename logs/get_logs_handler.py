@@ -47,7 +47,7 @@ async def _get_logs_from_elasticsearch(
     end_date: str,
 ) -> dict:
     '''
-    Coroutine that returns the first page of logs from ES.
+    Function that returns the first page of logs from ES.
 
     Parameters:
     - service_id (int): The ID of the service to fetch logs for
