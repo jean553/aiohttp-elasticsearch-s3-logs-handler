@@ -14,6 +14,10 @@ async def post_logs(
     """
     Handler for POST /logs requests.
     
+    Parameters:
+    - request (web.Request): The incoming HTTP request object
+    - es_client (Elasticsearch): The Elasticsearch client instance
+    
     Receives logs from a client and saves them into Elasticsearch.
     Each log is associated with a service ID and stored in a date-based index.
     """

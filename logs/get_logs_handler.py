@@ -31,6 +31,12 @@ def _get_log_to_string(log: Any) -> str:
     Returns a string representation of the given log.
     Convert single quotes to double quotes in order to match with JSON format
     (required for streaming)
+
+    Parameters:
+    - log (Any): The log object to be converted to string
+    
+    Returns:
+    - str: String representation of the log
     '''
     return str(log['_source']).replace("'", '"')
 
@@ -42,6 +48,14 @@ async def _get_logs_from_elasticsearch(
 ) -> dict:
     '''
     Coroutine that returns the first page of logs from ES.
+
+    Parameters:
+    - service_id (int): The ID of the service to fetch logs for
+    - start_date (str): The start date for the log search
+    - end_date (str): The end date for the log search
+    
+    Returns:
+    - dict: The response from Elasticsearch containing the logs
     '''
     async with aiohttp.ClientSession() as session:
         with async_timeout.timeout(ELASTICSEARCH_REQUESTS_TIMEOUT_SECONDS):
@@ -83,6 +97,13 @@ async def _scroll_logs_from_elasticsearch(
 ) -> dict:
     '''
     Scroll the next page of found results from Elasticsearch.
+
+    Parameters:
+    - service_id (int): The ID of the service to fetch logs for
+    - scroll_id (str): The scroll ID for pagination
+    
+    Returns:
+    - dict: The response from Elasticsearch containing the next page of logs
     '''
     # TODO: #123 we use a new session for one request here;
     # if we try to use the same session as before,
@@ -110,6 +131,10 @@ def _stream_logs_chunk(
 ):
     '''
     Streams each log one by one to the client.
+
+    Parameters:
+    - stream (aiohttp.web_response.StreamResponse): The stream response object
+    - logs (list): The list of logs to be streamed
     '''
     last_log_index = len(logs) - 1
 
@@ -129,11 +154,16 @@ async def get_logs(
     """
     Handler for GET /logs requests.
     
+    Parameters:
+    - request (web.Request): The incoming HTTP request object
+    - es_client (Elasticsearch): The Elasticsearch client instance
+    
     Retrieves and streams logs for a specific service within a given date range.
     Logs are fetched from Elasticsearch and S3, then streamed to the client
     as a JSON response.
     
-    Sends back logs according to the given dates range and service.
+    Returns:
+    - web.StreamResponse: A stream of logs in JSON format
     """
     service_id = request.match_info.get('id')
     start_date = request.match_info.get('start')
