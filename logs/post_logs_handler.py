@@ -11,9 +11,24 @@ async def post_logs(
     request: web.Request,
     es_client: Elasticsearch,
 ):
-    '''
-    Save sent logs into ElasticSearch.
-    '''
+    """
+    POST requests are used to submit data to be processed to a specified resource.
+    Unlike GET requests, which retrieve data, POST requests send data in the request body.
+    This makes POST suitable for submitting form data or uploading files.
+    In RESTful APIs, POST is typically used to create new resources.
+    The data sent in a POST request is not visible in the URL, making it more secure
+    for sensitive information compared to GET requests.
+    """
+    """
+    Handler for POST /logs requests.
+    
+    Parameters:
+    - request (web.Request): The incoming HTTP request object
+    - es_client (Elasticsearch): The Elasticsearch client instance
+    
+    Receives logs from a client and saves them into Elasticsearch.
+    Each log is associated with a service ID and stored in a date-based index.
+    """
     data = await request.json()
     logs = data['logs']
 
