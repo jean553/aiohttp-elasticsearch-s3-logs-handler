@@ -1,6 +1,6 @@
 '''
 Loads the configuration from the environment variables,
-prevents the service from starting if the variables cannot be found
+prevents the service from starting if the variable cannot be found
 '''
 import os
 
