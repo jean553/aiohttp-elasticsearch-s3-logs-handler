@@ -1,0 +1,31 @@
+# Credits and Licenses
+
+This project uses the following open-source libraries and their respective licenses:
+
+## Python Libraries
+
+1. aiohttp (Apache 2.0 License)
+   https://github.com/aio-libs/aiohttp/blob/master/LICENSE.txt
+
+2. elasticsearch (Apache 2.0 License)
+   https://github.com/elastic/elasticsearch-py/blob/master/LICENSE
+
+3. boto3 (Apache 2.0 License)
+   https://github.com/boto/boto3/blob/develop/LICENSE
+
+4. pytest (MIT License)
+   https://github.com/pytest-dev/pytest/blob/master/LICENSE
+
+5. pylint (GPL-2.0 License)
+   https://github.com/PyCQA/pylint/blob/master/LICENSE
+
+6. locust (MIT License)
+   https://github.com/locustio/locust/blob/master/LICENSE
+
+## Infrastructure
+
+1. Elasticsearch (Elastic License)
+   https://github.com/elastic/elasticsearch/blob/master/LICENSE.txt
+
+2. Kibana (Elastic License)
+   https://github.com/elastic/kibana/blob/master/LICENSE.txt
