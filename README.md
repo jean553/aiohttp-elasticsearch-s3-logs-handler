@@ -1,4 +1,4 @@
-# aiohttp-elasticsearch-s3-logs-handler
+# hello-world
 
 Asynchronous non-blocking logs handler using Elasticsearch for short-term storage
 and Amazon S3 for long-term storage.
