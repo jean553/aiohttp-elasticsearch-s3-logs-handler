@@ -17,4 +17,3 @@ Four containers are included into the project:
 * a fake S3 container for data upload from ES
 
 ## Create the service
-
