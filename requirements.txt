@@ -1,13 +1,13 @@
-elasticsearch
-boto3
-aiobotocore
-asyncio
-aiohttp
+elasticsearch  # https://pypi.org/project/elasticsearch/
+boto3  # https://pypi.org/project/boto3/
+aiobotocore  # https://pypi.org/project/aiobotocore/
+asyncio  # https://pypi.org/project/asyncio/
+aiohttp  # https://pypi.org/project/aiohttp/
 
 # for dev
-pylint
-locustio
+pylint  # https://pypi.org/project/pylint/
+locustio  # https://pypi.org/project/locust/
 
 # for tests
-pytest
-requests
+pytest  # https://pypi.org/project/pytest/
+requests  # https://pypi.org/project/requests/
